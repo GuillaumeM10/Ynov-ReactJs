@@ -1,17 +1,13 @@
-import { useContext } from "react";
-import { UserContext } from "../context/UserContext";
-import PopularMovies from "../components/PopularMovies";
+import PopularMovies from "../components/PopularMovies/PopularMovies";
+import "./home.scss";
 
 const Home = () => {
-  const { testValue } = useContext(UserContext);
-
   return (
-    <main className="home">
+    <div className="home">
       <p>Home page</p>
-      <p>{testValue}</p>
 
       <PopularMovies />
-    </main>
+    </div>
   );
 };
 

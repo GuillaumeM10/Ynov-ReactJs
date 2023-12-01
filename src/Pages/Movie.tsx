@@ -5,9 +5,9 @@ const Movie = () => {
   const { id } = useParams();
 
   return (
-    <main className="movie">
+    <div className="movie">
       <MovieContent id={id} />
-    </main>
+    </div>
   );
 };
 
