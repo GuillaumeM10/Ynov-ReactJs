@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import CrudService from "../../services/crud.service";
+import MoviesService from "../../services/movies.service";
 import { Link } from "react-router-dom";
 import { FetchMovies, Movie } from "../../types/movie.type";
 import "./popularMovies.scss";
@@ -16,7 +16,7 @@ const PopularMovies = () => {
   const getMovies = useCallback(async () => {
     try {
       setLoading(true);
-      const newMovies: FetchMovies = await CrudService.popularMovies(page);
+      const newMovies: FetchMovies = await MoviesService.popularMovies(page);
 
       setTotalPages(newMovies.total_pages);
       setTotalResults(newMovies.total_results);
@@ -60,9 +60,9 @@ const PopularMovies = () => {
     }
   }, [page]);
 
-  useEffect(() => {
-    console.log(movies);
-  }, [movies]);
+  // useEffect(() => {
+  //   console.log(movies);
+  // }, [movies]);
 
   useEffect(() => {
     if (!endPost && !loading) {

@@ -1,11 +1,12 @@
 .popular-movies {
+  position: relative;
 
   &-list {
     display: flex;
     gap: 20px;
     flex-wrap: wrap;
     justify-content: start;
-    margin: 0 -10px;
+    margin: 0;
     width: 100%;
   }
 
@@ -67,5 +68,20 @@
         }
       }
     }
+  }
+
+  .popular-movies-infos {
+    background-color: #3f3e3e;
+    color: #9f9f9f;
+    border-radius: 1rem;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    width: calc(100% - 2rem);
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    position: sticky;
+    top: 3rem;
+    z-index: 1;
   }
 }

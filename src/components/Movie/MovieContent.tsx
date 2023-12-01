@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useState } from "react";
-import CrudService from "../../services/crud.service";
+import MoviesService from "../../services/movies.service";
 import { Movie } from "../../types/movie.type";
 
 export type MovieContentPropsType = {
@@ -13,7 +13,7 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
 
   const getMovie = async (): Promise<void> => {
     try {
-      const res = await CrudService.getMovieById(id as string);
+      const res = await MoviesService.getMovieById(id as string);
       setLoading(false);
       setError(null);
       setMovie(res.data);
@@ -30,9 +30,9 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
     }
   }, [id]);
 
-  useEffect(() => {
-    console.log(movie);
-  }, [movie]);
+  // useEffect(() => {
+  //   console.log(movie);
+  // }, [movie]);
 
   return (
     <Fragment>

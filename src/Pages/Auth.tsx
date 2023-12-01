@@ -1,7 +1,8 @@
 import { useContext, useState } from "react";
 import { UserContext } from "../context/UserContext";
+import Signin from "../components/Auth/Signin";
 
-const Login = () => {
+const Auth = () => {
   const { user, setUser } = useContext(UserContext);
   const [userChange, setUserChange] = useState({
     username: "",
@@ -32,25 +33,28 @@ const Login = () => {
           <button onClick={logout}>Logout</button>
         </div>
       ) : (
-        <form onSubmit={handleSubmit}>
-          <h1>Login</h1>
-          <input
-            type="text"
-            placeholder="username"
-            name="username"
-            onChange={handleChange}
-          />
-          <input
-            type="password"
-            name="password"
-            placeholder="password"
-            onChange={handleChange}
-          />
-          <button type="submit">Login</button>
-        </form>
+        <>
+          <Signin />
+          <form onSubmit={handleSubmit}>
+            <h1>Login</h1>
+            <input
+              type="text"
+              placeholder="username"
+              name="username"
+              onChange={handleChange}
+            />
+            <input
+              type="password"
+              name="password"
+              placeholder="password"
+              onChange={handleChange}
+            />
+            <button type="submit">Login</button>
+          </form>
+        </>
       )}
     </div>
   );
 };
 
-export default Login;
+export default Auth;
