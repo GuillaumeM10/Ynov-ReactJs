@@ -1,56 +1,39 @@
 import { useContext, useState } from "react";
-import { UserContext } from "../context/UserContext";
+import { AuthContext } from "../context/AuthContext";
 import Signin from "../components/Auth/Signin";
+import { LOGOUT } from "../reducer/AuthReducer";
+import Signup from "../components/Auth/Signup";
 
 const Auth = () => {
-  const { user, setUser } = useContext(UserContext);
-  const [userChange, setUserChange] = useState({
-    username: "",
-    password: "",
-  });
+  const { state, dispatch } = useContext(AuthContext);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUserChange({ ...userChange, [e.target.name]: e.target.value });
-    console.log(userChange);
-  };
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setUser(userChange);
-    localStorage.setItem("user", JSON.stringify(userChange));
-  };
+  const [tabs, setTabs] = useState<boolean>(false);
 
   const logout = () => {
-    setUser(null);
+    dispatch({ type: LOGOUT });
     localStorage.removeItem("user");
   };
 
   return (
     <div>
-      {user ? (
+      {state.isLogged ? (
         <div>
-          <h1>Logged in as {user.username}</h1>
+          <h1>Logged in as {state.userInfos.email}</h1>
           <button onClick={logout}>Logout</button>
         </div>
       ) : (
         <>
-          <Signin />
-          <form onSubmit={handleSubmit}>
-            <h1>Login</h1>
-            <input
-              type="text"
-              placeholder="username"
-              name="username"
-              onChange={handleChange}
-            />
-            <input
-              type="password"
-              name="password"
-              placeholder="password"
-              onChange={handleChange}
-            />
-            <button type="submit">Login</button>
-          </form>
+          {tabs ? (
+            <div>
+              <Signup setTabs={setTabs} />
+              <button onClick={() => setTabs(false)}>Signin</button>
+            </div>
+          ) : (
+            <div>
+              <Signin />
+              <button onClick={() => setTabs(true)}>Signup</button>
+            </div>
+          )}
         </>
       )}
     </div>
