@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { Link } from "react-router-dom";
+import Header from "./Layout/Header/Header";
+import Footer from "./Layout/Footer/Footer";
 
 const Layout = ({ children }: any) => {
   const [page, setPage] = useState("");
@@ -13,13 +14,9 @@ const Layout = ({ children }: any) => {
 
   return (
     <div className={`mainLayout ${location.pathname === "/" ? "home" : page}`}>
-      {/* <Navbar /> */}
-      <header>
-        <Link to="/">header</Link>
-      </header>
-      <div className="defaultPaddingX defaultPaddingY">{children}</div>
-      <footer>footer</footer>
-      {/* <Footer /> */}
+      <Header />
+      <main>{children}</main>
+      <Footer />
     </div>
   );
 };

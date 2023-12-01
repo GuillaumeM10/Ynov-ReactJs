@@ -46,9 +46,9 @@ export interface Movie {
   tagline: string | undefined;
 }
 
-export interface Movies {
+export interface FetchMovies {
   page: number;
-  results: Movie[];
   total_pages: number;
+  results: Movie[];
   total_results: number;
 }

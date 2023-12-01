@@ -1,7 +1,7 @@
 import api from "./api.service";
 
 export type CrudServiceType = {
-  popularMovies: () => Promise<any>;
+  popularMovies: (page?: number) => Promise<any>;
   getMovieById: (id: string) => Promise<any>;
 };
 
@@ -10,7 +10,7 @@ const popularMovies = async (page?: number) => {
   if (page) {
     endPoint = `/movie/popular?page=${page}`;
   }
-  return await api.get(endPoint);
+  return (await api.get(endPoint)).data;
 };
 
 const getMovieById = async (id: string) => {
