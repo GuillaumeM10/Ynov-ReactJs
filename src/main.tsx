@@ -2,12 +2,12 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import "./index.scss";
-import { ExempleProvider } from "./context/ExempleContext.tsx";
+import { UserProvider } from "./context/UserContext.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <ExempleProvider>
+    <UserProvider>
       <App />
-    </ExempleProvider>
+    </UserProvider>
   </React.StrictMode>
 );

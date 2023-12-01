@@ -1,9 +1,9 @@
 import { useContext } from "react";
-import { ExempleContext } from "../context/ExempleContext";
+import { UserContext } from "../context/UserContext";
 import PopularMovies from "../components/PopularMovies";
 
 const Home = () => {
-  const { testValue } = useContext(ExempleContext);
+  const { testValue } = useContext(UserContext);
 
   return (
     <main className="home">
