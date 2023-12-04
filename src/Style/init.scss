@@ -1,0 +1,57 @@
+$mobile: 320px;
+$tablet: 768px;
+$desktop: 1024px;
+$bg : #242424;
+$bg2: #3f3e3e;
+$primary : #aecb65;
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-weight: 400;
+
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+}
+
+html {
+  font-size: 62.5%;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  line-height: 1;
+}
+
+main,
+header,
+footer {
+  padding: 20px;
+
+  @media (min-width: $tablet) {
+    padding: 40px;
+  }
+
+  @media (min-width: $desktop) {
+    padding: 60px;
+  }
+}
+
+.bg {
+  background-color: $bg;
+}
+
+.bg2 {
+  background-color: $bg2;
+}
+
+.primary-color {
+  color: $primary;
+}
+
+.primary-bg {
+  background-color: $primary;
+}

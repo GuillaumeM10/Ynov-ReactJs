@@ -3,6 +3,7 @@ import MoviesService from "../../services/movies.service";
 import { Link } from "react-router-dom";
 import { FetchMovies, Movie } from "../../types/movie.type";
 import "./popularMovies.scss";
+import Unknown from "../../assets/unknown.jpg";
 
 const PopularMovies = () => {
   const [movies, setMovies] = useState<Array<Movie>>([]);
@@ -25,7 +26,7 @@ const PopularMovies = () => {
         setMovies([]);
         setEndPost(true);
         setLoading(false);
-      } else if (newMovies?.results.length === 0) {
+      } else if (newMovies?.results?.length === 0) {
         setEndPost(true);
         setLoading(false);
       } else if (page === 1) {
@@ -116,9 +117,8 @@ const PopularMovies = () => {
                     src={
                       movie.poster_path
                         ? "https://image.tmdb.org/t/p/w500/" + movie.poster_path
-                        : "https://via.placeholder.com/500x750"
+                        : Unknown
                     }
-                    width={500}
                     className="popular-movie-img"
                     alt=""
                   />

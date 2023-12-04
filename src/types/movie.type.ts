@@ -52,3 +52,38 @@ export interface FetchMovies {
   results: Movie[];
   total_results: number;
 }
+
+export interface Cast {
+  id: number;
+  character: string;
+  name: string;
+  original_name: string;
+  profile_path: string;
+  cast_id: number;
+  credit_id: string;
+  order: number;
+  popularity: number;
+  known_for_department: string;
+  gender: number;
+  adult: boolean;
+}
+
+export interface Crew {
+  id: number;
+  department: string;
+  job: string;
+  name: string;
+  original_name: string;
+  profile_path: string;
+  credit_id: string;
+  popularity: number;
+  known_for_department: string;
+  gender: number;
+  adult: boolean;
+}
+
+export interface Credits {
+  id: number;
+  cast: Cast[];
+  crew: Crew[];
+}
