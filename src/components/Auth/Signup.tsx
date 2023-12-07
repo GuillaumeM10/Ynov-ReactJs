@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { auth } from "../../services/firebase.service";
 import { createUserWithEmailAndPassword } from "firebase/auth";
+import UserDetailsService from "../../services/userdetails.service";
 
 export type signupPropsType = {
   setTabs: React.Dispatch<React.SetStateAction<boolean>>;
@@ -21,8 +22,10 @@ const Signup = ({ setTabs }: signupPropsType) => {
         email,
         password
       );
+      await UserDetailsService.createUserdetailsColection(newUser.user.uid);
+
       if (newUser.user) {
-        setTabs(false);
+        // setTabs(false);
       }
     } catch (error: any) {
       const errorCode = error.code;

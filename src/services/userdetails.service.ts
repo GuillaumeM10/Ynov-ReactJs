@@ -20,18 +20,14 @@ export type UserDetailsServiceType = {
 };
 
 const createUserdetailsColection = async (userId: string) => {
-  console.log("userId", userId);
-
   if (!userId) return;
+
   try {
-    console.log("here");
+    const userdetails = await getUserDetails(userId);
+    if (!userdetails.empty) return;
 
     const resp = await addDoc(collection(db, "userDetails"), {
       userId,
-      admin: false,
-      likes: [],
-      pseudo: "",
-      ratesId: "",
     });
     return resp;
   } catch (error) {
@@ -46,11 +42,6 @@ const getUserDetails = async (userId: string) => {
 
   try {
     const querySnapshot = await getDocs(q);
-    console.log("querySnapshot", querySnapshot);
-
-    querySnapshot.forEach((doc) => {
-      console.log(doc.id, " => ", doc.data());
-    });
     return querySnapshot;
   } catch (error) {
     console.log(error);
