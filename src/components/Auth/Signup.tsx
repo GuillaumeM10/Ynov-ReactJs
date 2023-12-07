@@ -41,11 +41,11 @@ const Signup = ({ setTabs }: signupPropsType) => {
   };
 
   return (
-    <div>
+    <div className="form">
       <h1>Register Form</h1>
 
-      <div>
-        <label>Email</label>
+      <div className="input">
+        <label>Email :</label>
         <input
           type="email"
           value={email}
@@ -53,8 +53,8 @@ const Signup = ({ setTabs }: signupPropsType) => {
         />
       </div>
 
-      <div>
-        <label>Password</label>
+      <div className="input">
+        <label>Password :</label>
         <input
           type="password"
           value={password}

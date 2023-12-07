@@ -20,6 +20,14 @@ const Router = () => {
         }
       />
       <Route path="*" element={<NotFound />} />
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute to="/" bool={false}>
+            <Auth />
+          </ProtectedRoute>
+        }
+      />
     </Routes>
   );
 };
