@@ -1,0 +1,22 @@
+.load-more {
+  margin: 2rem auto;
+  display: block;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+  background-color: $primary;
+  border: 0;
+  border-radius: 0.4rem;
+  padding: 1rem 2rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+
+  &:hover {
+    background-color: darken($color: $primary, $amount: 20%);
+  }
+}
+
+.loading {
+  margin: 2rem auto;
+}

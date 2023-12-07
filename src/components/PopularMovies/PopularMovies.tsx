@@ -130,7 +130,19 @@ const PopularMovies = () => {
           <p>No movies found</p>
         )}
       </ul>
-      {loading && <p>Loading</p>}
+      {loading ? (
+        <p className="loading">Loading</p>
+      ) : (
+        <button
+          onClick={() => {
+            const nextPage = page + 1;
+            setPage(nextPage);
+          }}
+          className="load-more"
+        >
+          Charger plus
+        </button>
+      )}
       {error && <p>{error}</p>}
     </section>
   );
