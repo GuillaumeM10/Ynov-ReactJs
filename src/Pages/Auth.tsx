@@ -9,10 +9,16 @@ const Auth = () => {
   const { state, dispatch } = useContext(AuthContext);
 
   const [tabs, setTabs] = useState<boolean>(false);
+  const [slide, setSlide] = useState<boolean>(false);
 
   const logout = () => {
     dispatch({ type: LOGOUT });
     localStorage.removeItem("user");
+  };
+
+  const changeTabSlide = () => {
+    setTabs(!tabs);
+    setSlide(!slide);
   };
 
   return (
@@ -24,27 +30,24 @@ const Auth = () => {
         </div>
       ) : (
         <>
-          {tabs ? (
-            <>
-              <Signup setTabs={setTabs} />
-              <div className="slide">
-                <button onClick={() => setTabs(false)}>Signin</button>
-                <button className="active" onClick={() => setTabs(true)}>
-                  Signup
-                </button>
+          {slide ? (
+            <div className="slide">
+              <div className="slider">
+                <div className="activeSlide active" />
               </div>
-            </>
+              <button onClick={changeTabSlide}>Signin</button>
+              <button>Signup</button>
+            </div>
           ) : (
-            <>
-              <Signin />
-              <div className="slide">
-                <button className="active" onClick={() => setTabs(false)}>
-                  Signin
-                </button>
-                <button onClick={() => setTabs(true)}>Signup</button>
+            <div className="slide">
+              <div className="slider">
+                <div className="activeSlide" />
               </div>
-            </>
+              <button>Signin</button>
+              <button onClick={changeTabSlide}>Signup</button>
+            </div>
           )}
+          {tabs ? <Signup setTabs={setTabs} /> : <Signin />}
         </>
       )}
     </div>
