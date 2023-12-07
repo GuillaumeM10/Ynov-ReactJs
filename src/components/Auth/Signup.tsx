@@ -25,7 +25,7 @@ const Signup = ({ setTabs }: signupPropsType) => {
       await UserDetailsService.createUserdetailsColection(newUser.user.uid);
 
       if (newUser.user) {
-        // setTabs(false);
+        setTabs(false);
       }
     } catch (error: any) {
       const errorCode = error.code;
