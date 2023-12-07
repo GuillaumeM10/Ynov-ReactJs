@@ -17,8 +17,6 @@ const Signin = () => {
 
   const onSubmit = async () => {
     setError(null);
-    console.log("email", email);
-    console.log("password", password);
 
     try {
       const userResponse = await signInWithEmailAndPassword(
