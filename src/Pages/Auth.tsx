@@ -3,6 +3,7 @@ import { AuthContext } from "../context/AuthContext";
 import Signin from "../components/Auth/Signin";
 import { LOGOUT } from "../reducer/AuthReducer";
 import Signup from "../components/Auth/Signup";
+import "./auth.scss";
 
 const Auth = () => {
   const { state, dispatch } = useContext(AuthContext);
@@ -15,7 +16,7 @@ const Auth = () => {
   };
 
   return (
-    <div>
+    <div className="auth">
       {state.isLogged ? (
         <div>
           <h1>Logged in as {state.userInfos.email}</h1>
@@ -24,15 +25,25 @@ const Auth = () => {
       ) : (
         <>
           {tabs ? (
-            <div>
+            <>
               <Signup setTabs={setTabs} />
-              <button onClick={() => setTabs(false)}>Signin</button>
-            </div>
+              <div className="slide">
+                <button onClick={() => setTabs(false)}>Signin</button>
+                <button className="active" onClick={() => setTabs(true)}>
+                  Signup
+                </button>
+              </div>
+            </>
           ) : (
-            <div>
+            <>
               <Signin />
-              <button onClick={() => setTabs(true)}>Signup</button>
-            </div>
+              <div className="slide">
+                <button className="active" onClick={() => setTabs(false)}>
+                  Signin
+                </button>
+                <button onClick={() => setTabs(true)}>Signup</button>
+              </div>
+            </>
           )}
         </>
       )}
