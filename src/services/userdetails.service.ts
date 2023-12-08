@@ -7,6 +7,7 @@ import {
   getDocs,
   query,
   where,
+  updateDoc,
 } from "firebase/firestore";
 import { db } from "./firebase.service";
 
@@ -17,6 +18,10 @@ export type UserDetailsServiceType = {
   getUserDetails: (
     userId: string
   ) => Promise<QuerySnapshot<DocumentData, DocumentData>>;
+  updateUserDetails: (
+    userId: string,
+    data: DocumentData
+  ) => Promise<QuerySnapshot<DocumentData, DocumentData> | undefined>;
 };
 
 const createUserdetailsColection = async (userId: string) => {
@@ -49,9 +54,30 @@ const getUserDetails = async (userId: string) => {
   }
 };
 
+const updateUserDetails = async (userId: string, data: DocumentData) => {
+  const collectionUserDetails = collection(db, "userDetails");
+  const q = query(collectionUserDetails, where("userId", "==", userId));
+
+  try {
+    const querySnapshot = await getDocs(q);
+    console.log("querySnapshot", querySnapshot);
+    if (querySnapshot.empty) return;
+
+    const doc = querySnapshot.docs[0];
+    console.log("doc", doc.ref);
+    const update = await updateDoc(doc.ref, data);
+    console.log("updateUserDetails", update);
+    return update;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
 const UserDetailsService: UserDetailsServiceType = {
   createUserdetailsColection,
   getUserDetails,
+  updateUserDetails,
 };
 
 export default UserDetailsService;

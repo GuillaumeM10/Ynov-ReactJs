@@ -4,6 +4,7 @@ import Signin from "../components/Auth/Signin";
 import { LOGOUT, UPDATE_USER_INFOS } from "../reducer/AuthReducer";
 import Signup from "../components/Auth/Signup";
 import "./auth.scss";
+import UserDetailsService from "../services/userdetails.service";
 
 const Auth = () => {
   const { state, dispatch } = useContext(AuthContext);
@@ -23,6 +24,22 @@ const Auth = () => {
   const logout = () => {
     dispatch({ type: LOGOUT });
     localStorage.removeItem("user");
+  };
+
+  const fetchData = async () => {
+    const data = {
+      email: email,
+      password: password,
+    };
+    try {
+      const resp = await UserDetailsService.updateUserDetails(
+        state.userInfos.uid,
+        data
+      );
+      console.log(resp);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const onSubmit = () => {
@@ -60,6 +77,13 @@ const Auth = () => {
 
             <button type="submit">Update</button>
           </form>
+          <button
+            onClick={() => {
+              fetchData();
+            }}
+          >
+            get
+          </button>
           <button onClick={logout}>Logout</button>
         </div>
       ) : (
