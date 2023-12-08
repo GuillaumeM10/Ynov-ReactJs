@@ -1,10 +1,31 @@
 import { useLocation, useNavigate } from "react-router-dom";
+import { Fragment, useState, useEffect } from "react";
 import "./breadcrum.scss";
+import MoviesService from "../../../services/movies.service";
 
 const Breadcrumb = () => {
   const { pathname } = useLocation();
   const pathnames = pathname.split("/").filter((x) => x);
   const navigate = useNavigate();
+  const [nameMovie, setNameMovie] = useState<string>("");
+
+  const getMovie = async (id: string): Promise<void> => {
+    try {
+      const res = await MoviesService.getMovieById(id);
+      setNameMovie(res.title);
+    } catch (err: unknown) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    if (pathnames.length > 0) {
+      const last = pathnames[pathnames.length - 1];
+      if (Number(last)) {
+        getMovie(last);
+      }
+    }
+  }, [pathname]);
 
   return (
     <div className="breadcrumb-container">
@@ -36,7 +57,7 @@ const Breadcrumb = () => {
           const routeTo = `/${pathnames.slice(0, index + 1).join("/")}`;
           const isLast = index === pathnames.length - 1;
           return isLast ? (
-            <>
+            <Fragment key={index}>
               <svg
                 enableBackground="new 0 0 32 32"
                 height="32px"
@@ -51,10 +72,14 @@ const Breadcrumb = () => {
                   fill="#fff"
                 />
               </svg>
-              <span key={name}>{name}</span>
-            </>
+              {Number(name) ? (
+                <span key={nameMovie}>{nameMovie}</span>
+              ) : (
+                <span key={name}>{name}</span>
+              )}
+            </Fragment>
           ) : (
-            <>
+            <Fragment key={index}>
               <svg
                 enableBackground="new 0 0 32 32"
                 height="32px"
@@ -76,7 +101,7 @@ const Breadcrumb = () => {
               >
                 {name}
               </button>
-            </>
+            </Fragment>
           );
         })}
       </div>
