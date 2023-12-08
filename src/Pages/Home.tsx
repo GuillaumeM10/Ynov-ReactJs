@@ -31,7 +31,6 @@ const Home = () => {
 
   return (
     <div className="home">
-      <p>Home page</p>
       <button
         onClick={() => {
           fetchData();
