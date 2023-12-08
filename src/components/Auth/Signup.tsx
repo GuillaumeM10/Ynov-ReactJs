@@ -2,6 +2,7 @@ import { useState } from "react";
 import { auth } from "../../services/firebase.service";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import UserDetailsService from "../../services/userdetails.service";
+import { toast } from "react-hot-toast/headless";
 
 export type signupPropsType = {
   setTabs: React.Dispatch<React.SetStateAction<boolean>>;
@@ -13,7 +14,8 @@ const Signup = ({ setTabs }: signupPropsType) => {
 
   const [error, setError] = useState<string | null>(null);
 
-  const onSubmit = async () => {
+  const onSubmit = async (e: FormEvent<HTMLFormElement> | undefined) => {
+    e?.preventDefault();
     setError(null);
 
     try {
@@ -25,6 +27,7 @@ const Signup = ({ setTabs }: signupPropsType) => {
       await UserDetailsService.createUserdetailsColection(newUser.user.uid);
 
       if (newUser.user) {
+        toast.success("Inscription réussie");
         setTabs(false);
       }
     } catch (error: any) {
@@ -32,23 +35,27 @@ const Signup = ({ setTabs }: signupPropsType) => {
 
       if (errorCode === "auth/weak-password") {
         setError("Le mot de passe doit faire au minimum 6 caractères");
+        toast.error("Le mot de passe doit faire au minimum 6 caractères");
       } else if (errorCode === "auth/email-already-in-use") {
         setError("L'email est déjà utilisé");
+        toast.error("L'email est déjà utilisé");
       } else {
         setError("Une erreur est survenue");
+        toast.error("Une erreur est survenue");
       }
     }
   };
 
   return (
-    <div className="form">
-      <h1>Register Form</h1>
+    <form onSubmit={(e) => onSubmit(e)} className="form">
+      <h1>Inscription</h1>
 
       <div className="input">
         <label>Email :</label>
         <input
           type="email"
           value={email}
+          autoComplete="email"
           onChange={(e) => setEmail(e.target.value)}
         />
       </div>
@@ -58,16 +65,20 @@ const Signup = ({ setTabs }: signupPropsType) => {
         <input
           type="password"
           value={password}
+          autoComplete="current-password"
           onChange={(e) => setPassword(e.target.value)}
         />
       </div>
 
       {error && <p style={{ color: "red" }}>{error}</p>}
 
-      <button onClick={onSubmit} disabled={email === "" || password === ""}>
-        Register
+      <button
+        onClick={() => onSubmit(undefined)}
+        disabled={email === "" || password === ""}
+      >
+        s'inscrire
       </button>
-    </div>
+    </form>
   );
 };
 

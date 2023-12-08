@@ -4,17 +4,17 @@ import Movie from "../Pages/Movie";
 import NotFound from "../Pages/NotFound";
 import Auth from "../Pages/Auth";
 import ProtectedRoute from "./ProtectedRoute";
+import Profile from "../Pages/Profile";
 
 const Router = () => {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="film/:id" element={<Movie />} />
-      <Route path="/authentification" element={<Auth />} />
       <Route
-        path="/profile"
+        path="/authentification"
         element={
-          <ProtectedRoute to="/" bool={false}>
+          <ProtectedRoute to="/" bool={true}>
             <Auth />
           </ProtectedRoute>
         }
@@ -24,7 +24,7 @@ const Router = () => {
         path="/profile"
         element={
           <ProtectedRoute to="/" bool={false}>
-            <Auth />
+            <Profile />
           </ProtectedRoute>
         }
       />

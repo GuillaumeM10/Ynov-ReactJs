@@ -1,9 +1,10 @@
-import { useContext, useState } from "react";
+import { FormEvent, useContext, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { AuthContext } from "../../context/AuthContext";
 import { auth } from "../../services/firebase.service";
 import { LOGIN } from "../../reducer/AuthReducer";
+import { toast } from "react-hot-toast";
 
 const Signin = () => {
   const { dispatch } = useContext(AuthContext);
@@ -15,7 +16,8 @@ const Signin = () => {
 
   const [error, setError] = useState<string | null>(null);
 
-  const onSubmit = async () => {
+  const onSubmit = async (e: FormEvent<HTMLFormElement> | undefined) => {
+    e?.preventDefault();
     setError(null);
 
     try {
@@ -29,29 +31,34 @@ const Signin = () => {
           dispatch({ type: LOGIN, payload: userResponse.user });
           localStorage.setItem("user", JSON.stringify(userResponse.user));
           navigate(state?.from ? state.from : "/");
+          toast.success("Connexion réussie");
         }, 2000);
       }
     } catch (error: any) {
       const errorCode = error.code;
       if (errorCode === "auth/wrong-password") {
         setError("Le mot de passe est invalide");
+        toast.error("Le mot de passe est invalide");
       } else if (errorCode === "auth/user-not-found") {
         setError("L'email est invalide");
+        toast.error("L'email est invalide");
       } else {
         setError("Une erreur est survenue");
+        toast.error("Une erreur est survenue");
       }
     }
   };
 
   return (
-    <div className="form">
-      <h1>Login Form</h1>
+    <form onSubmit={(e) => onSubmit(e)} className="form">
+      <h1>Connexion</h1>
 
       <div className="input">
         <label>Email :</label>
         <input
           type="email"
           value={email}
+          autoComplete="email"
           onChange={(e) => setEmail(e.target.value)}
         />
       </div>
@@ -61,16 +68,20 @@ const Signin = () => {
         <input
           type="password"
           value={password}
+          autoComplete="current-password"
           onChange={(e) => setPassword(e.target.value)}
         />
       </div>
 
       {error && <p style={{ color: "red" }}>{error}</p>}
 
-      <button onClick={onSubmit} disabled={email === "" || password === ""}>
-        Login
+      <button
+        onClick={() => onSubmit(undefined)}
+        disabled={email === "" || password === ""}
+      >
+        se connecter
       </button>
-    </div>
+    </form>
   );
 };
 
