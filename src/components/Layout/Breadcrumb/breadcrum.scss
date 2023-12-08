@@ -1,0 +1,76 @@
+.breadcrumb-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 2rem;
+
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+
+    button,
+    span {
+      font-size: 1.6rem;
+      line-height: 2.4rem;
+      color: white;
+      border: none;
+      text-transform: capitalize;
+      cursor: pointer;
+      transition: color .3s ease-in-out;
+
+      &:hover {
+        color: white;
+      }
+    }
+
+    button {
+      color: rgba(255, 255, 255, 0.607);
+    }
+
+    svg {
+      transform: rotate(90deg);
+      width: 1.6rem;
+      height: 1.6rem;
+      opacity: 0.607;
+    }
+  }
+
+  .back {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    color: rgba(255, 255, 255, 0.607);
+    font-size: 1.6rem;
+    line-height: 2.4rem;
+    text-transform: capitalize;
+    cursor: pointer;
+    transition: color .2s ease-in-out;
+
+    svg {
+      transform: rotate(-90deg);
+      width: 1.6rem;
+      height: 1.6rem;
+      opacity: 0.607;
+      transition: opacity .2s ease-in-out;
+    }
+
+    &:hover {
+      color: white;
+
+      svg {
+        opacity: 1;
+      }
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 1rem;
+  }
+}

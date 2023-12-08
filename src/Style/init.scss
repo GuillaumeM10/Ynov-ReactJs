@@ -29,14 +29,28 @@ body {
 main,
 header,
 footer {
-  padding: 20px;
+  padding: 2rem;
 
   @media (min-width: $tablet) {
-    padding: 40px;
+    padding: 4rem;
   }
 
   @media (min-width: $desktop) {
-    padding: 60px;
+    padding: 6rem;
+  }
+}
+
+main {
+  min-height: 69vh;
+  display: flex;
+  flex-direction: column;
+
+  @media (min-width: $tablet) {
+    min-height: 62vh;
+  }
+
+  @media (min-width: $desktop) {
+    min-height: 50vh;
   }
 }
 

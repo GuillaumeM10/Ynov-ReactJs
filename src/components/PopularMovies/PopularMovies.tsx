@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { FetchMovies, Movie } from "../../types/movie.type";
 import "./popularMovies.scss";
 import Unknown from "../../assets/unknown.jpg";
+import ScrollTop from "../ScrollTop";
 
 const PopularMovies = () => {
   const [movies, setMovies] = useState<Array<Movie>>([]);
@@ -61,10 +62,6 @@ const PopularMovies = () => {
     }
   }, [page]);
 
-  // useEffect(() => {
-  //   console.log(movies);
-  // }, [movies]);
-
   useEffect(() => {
     if (!endPost && !loading) {
       const handleScroll = () => {
@@ -86,15 +83,15 @@ const PopularMovies = () => {
 
   return (
     <section className="popular-movies">
-      <p>Popular Movies</p>
-
+      <ScrollTop />
       {totalPages > 0 && totalResults && (
         <div className="popular-movies-infos">
           <p>
-            Page {page} of {totalPages}
+            Page <span></span>
+            {page} sur {totalPages}
           </p>
           <p>
-            total results : {movies.length} of {totalResults}
+            Nombre de résultats : {movies.length} sur {totalResults}
           </p>
         </div>
       )}
@@ -108,7 +105,7 @@ const PopularMovies = () => {
                 id={movie.id?.toString()}
                 className="popular-movie-card"
               >
-                <Link to={"/movie/" + movie.id}>
+                <Link to={"/film/" + movie.id}>
                   <div className="data">
                     <p className="year">{year}</p>
                     <p className="title">{movie.title}</p>

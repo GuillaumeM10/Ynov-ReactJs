@@ -4,8 +4,6 @@ import "./home.scss";
 const Home = () => {
   return (
     <div className="home">
-      <p>Home page</p>
-
       <PopularMovies />
     </div>
   );
