@@ -61,23 +61,31 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
     }
   };
 
-  const getLikeMovie = async (): Promise<void> => {
+  const getLike = async (): Promise<void> => {
     try {
-      await MoviesService.getLikeMovie(movie as Movie);
-      setIsLike(true);
+      await MoviesService.getLikeMovie(movie as Movie).then((res) => {
+        if (!res) {
+          setIsLike(false);
+          return;
+        }
+        setIsLike(true);
+      });
     } catch (err: unknown) {
       console.log(err);
     }
   };
 
   useEffect(() => {
-    if (id) {
-      setLoading(true);
-      getMovie();
-      getCredit();
-      state.isLogged && getLikeMovie();
-    }
+    setLoading(true);
+    getMovie();
+    getCredit();
   }, [id]);
+
+  useEffect(() => {
+    if (movie) {
+      getLike();
+    }
+  }, [movie]);
 
   const likeMovie = async () => {
     try {
@@ -107,7 +115,7 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
             <div className="top">
               <div className="movie-content__image">
                 <p className="year">{movie.release_date?.split("-")[0]}</p>
-                {isLike ? (
+                {!isLike ? (
                   <img
                     src="/heart.png"
                     className="like"
