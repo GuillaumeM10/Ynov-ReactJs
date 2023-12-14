@@ -18,6 +18,8 @@ export const authReducer = (state: any, action: any) => {
         userInfos: action.payload,
       };
     case UPDATE_USER_INFOS:
+      console.log(action.payload);
+      
       return {
         ...state,
         isLoading: false,

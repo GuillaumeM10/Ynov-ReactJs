@@ -9,10 +9,10 @@ const Footer = () => {
     <footer>
       <div className="footer-container">
         <div className="footer-links">
-          <Link to="/a-propos">À propos</Link>
-          <Link to="/contact">Contact</Link>
-          <Link to="/cgu">CGU</Link>
-          <Link to="/aide">Aide</Link>
+          <Link className="terciary" to="/a-propos">À propos</Link>
+          <Link className="terciary" to="/contact">Contact</Link>
+          <Link className="terciary" to="/cgu">CGU</Link>
+          <Link className="terciary" to="/aide">Aide</Link>
         </div>
         <div className="footer-social">
           <a

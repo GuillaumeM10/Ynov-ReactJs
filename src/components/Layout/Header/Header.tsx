@@ -25,7 +25,7 @@ const Header = () => {
       <div className={`bg menu-container${burgerActive ? " active" : ""}`}>
         <Link
           to="/"
-          className={window.location.pathname === "/" ? "active" : ""}
+          className={window.location.pathname === "/" ? "active primary" : "primary"}
         >
           Accueil
         </Link>
@@ -33,7 +33,7 @@ const Header = () => {
         {state.isLogged ? (
           <Link
             to="/profile"
-            className={window.location.pathname === "/profile" ? "active" : ""}
+            className={window.location.pathname === "/profile" ? "active primary" : "primary"}
             onClick={() => setBurgerActive(false)}
           >
             Profil
@@ -42,7 +42,7 @@ const Header = () => {
           <Link
             to="/authentification"
             className={
-              window.location.pathname === "/authentification" ? "active" : ""
+              window.location.pathname === "/authentification" ? "active primary" : "primary"
             }
             onClick={() => setBurgerActive(false)}
           >

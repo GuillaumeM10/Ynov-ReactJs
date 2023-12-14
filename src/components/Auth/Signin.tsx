@@ -5,6 +5,7 @@ import { AuthContext } from "../../context/AuthContext";
 import { auth } from "../../services/firebase.service";
 import { LOGIN } from "../../reducer/AuthReducer";
 import { toast } from "react-hot-toast";
+import AuthService from "../../services/auth.service";
 
 const Signin = () => {
   const { dispatch } = useContext(AuthContext);
@@ -27,8 +28,15 @@ const Signin = () => {
         password
       );
       if (userResponse.user) {
+        const profile = await AuthService.getAuthUser()
         setTimeout(() => {
-          dispatch({ type: LOGIN, payload: userResponse.user });
+          dispatch({ 
+            type: LOGIN, 
+            payload: {
+              ...profile, 
+              ...userResponse.user
+            } 
+          });
           localStorage.setItem("user", JSON.stringify(userResponse.user));
           navigate(state?.from ? state.from : "/");
           toast.success("Connexion réussie");
