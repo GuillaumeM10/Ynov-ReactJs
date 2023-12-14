@@ -59,17 +59,14 @@ const getCredits = async (id: string) => {
 };
 
 const getLikeMovie = async (movie: Movie) => {
-  const moviesRef = collection(db, "Movies");
-  const q = query(moviesRef, where("movieId", "==", movie.id));
-
-  try {
-    const querySnapshot = await getDocs(q);
-    const movieExists = querySnapshot.docs[0];
-    return movieExists;
-  } catch (error) {
-    console.log(error);
-    throw error;
+  const q = query(collection(db, "Movies"), where("movieId", "==", movie.id));
+  const querySnapshot = await getDocs(q);
+  if (querySnapshot.empty) {
+    console.log("No matching documents.");
+    return;
   }
+
+  return querySnapshot.docs[0];
 };
 
 const likeMovie = async (movie: Movie) => {
