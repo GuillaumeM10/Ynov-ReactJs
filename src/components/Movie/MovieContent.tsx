@@ -1,10 +1,11 @@
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useContext, useEffect, useState } from "react";
 import MoviesService from "../../services/movies.service";
 import { Cast, Credits, Crew, Movie } from "../../types/movie.type";
 import "./movie-content.scss";
 import { Navigation, Pagination, Scrollbar, A11y } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import Unknown from "../../assets/unknown.jpg";
+import { AuthContext } from "../../context/AuthContext";
 
 export type MovieContentPropsType = {
   id: string | undefined;
@@ -15,6 +16,8 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [credits, setCredits] = useState<Credits>();
+  const { state } = useContext(AuthContext);
+  const [isLike, setIsLike] = useState(false);
 
   const getMovie = async (): Promise<void> => {
     try {
@@ -58,13 +61,41 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
     }
   };
 
+  const getLikeMovie = async (): Promise<void> => {
+    try {
+      await MoviesService.getLikeMovie(movie as Movie);
+      setIsLike(true);
+    } catch (err: unknown) {
+      console.log(err);
+    }
+  };
+
   useEffect(() => {
     if (id) {
       setLoading(true);
       getMovie();
       getCredit();
+      state.isLogged && getLikeMovie();
     }
   }, [id]);
+
+  const likeMovie = async () => {
+    try {
+      await MoviesService.likeMovie(movie as Movie);
+      setIsLike(!isLike);
+    } catch (err: unknown) {
+      console.log(err);
+    }
+  };
+
+  const removeLikeMovie = async () => {
+    try {
+      await MoviesService.removeLikeMovie(movie as Movie);
+      setIsLike(!isLike);
+    } catch (err: unknown) {
+      console.log(err);
+    }
+  };
 
   return (
     <Fragment>
@@ -76,6 +107,23 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
             <div className="top">
               <div className="movie-content__image">
                 <p className="year">{movie.release_date?.split("-")[0]}</p>
+                {isLike ? (
+                  <img
+                    src="/heart.png"
+                    className="like"
+                    onClick={() => {
+                      state.isLogged && likeMovie();
+                    }}
+                  />
+                ) : (
+                  <img
+                    src="/heart_fill.png"
+                    className="like"
+                    onClick={() => {
+                      state.isLogged && removeLikeMovie();
+                    }}
+                  />
+                )}
                 <img
                   src={
                     movie.poster_path
