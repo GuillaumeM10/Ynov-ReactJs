@@ -4,6 +4,7 @@ import { db } from "./firebase.service";
 import {
   addDoc,
   collection,
+  deleteDoc,
   doc,
   getDocs,
   query,
@@ -61,9 +62,10 @@ const getCredits = async (id: string) => {
 const getLikeMovie = async (movie: Movie) => {
   const q = query(collection(db, "Movies"), where("movieId", "==", movie.id));
   const querySnapshot = await getDocs(q);
+  //if empty, return error
   if (querySnapshot.empty) {
     console.log("No matching documents.");
-    return;
+    return false;
   }
 
   return querySnapshot.docs[0];
@@ -96,11 +98,17 @@ const removeLikeMovie = async (movie: Movie) => {
   //if movie exists, updtade likes
   if (movieExists) {
     const movieRef = doc(db, "Movies", movieExists.id);
-    await updateDoc(movieRef, {
-      likes: movieExists.data().likes - 1,
-    });
-    console.log("Document updated with ID: ", movieRef.id);
-    return movieRef;
+    if (movieExists.data().likes - 1 < 1) {
+      await deleteDoc(movieRef);
+      console.log("Document deleted with ID: ", movieRef.id);
+    } else {
+      await updateDoc(movieRef, {
+        likes: movieExists.data().likes - 1,
+      });
+      console.log("Document updated with ID: ", movieRef.id);
+      //si like es 0, eliminar
+      console.log(movieExists.data().likes);
+    }
   }
 };
 

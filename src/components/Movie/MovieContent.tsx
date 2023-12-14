@@ -63,8 +63,13 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
 
   const getLike = async (): Promise<void> => {
     try {
-      await MoviesService.getLikeMovie(movie as Movie);
-      setIsLike(true);
+      await MoviesService.getLikeMovie(movie as Movie).then((res) => {
+        if (!res) {
+          setIsLike(false);
+          return;
+        }
+        setIsLike(true);
+      });
     } catch (err: unknown) {
       console.log(err);
     }
