@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import CrudService from "../services/crud.service";
+import MovieService from "../services/movies.service";
 import { Link } from "react-router-dom";
 import { Movies } from "../types/movie.type";
 
@@ -19,7 +19,7 @@ const PopularMovies = () => {
 
   const getMovies = async (): Promise<void> => {
     try {
-      const res = await CrudService.popularMovies(page);
+      const res = await MovieService.popularMovies(page);
       setLoading(false);
       setError(null);
       setMovies(res.data);

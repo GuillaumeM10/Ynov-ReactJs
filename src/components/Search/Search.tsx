@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Movie } from "../../types/movie.type";
 import { useState, useEffect, useRef } from "react";
-import CrudService from "../../services/movies.service";
+import MovieService from "../../services/movies.service";
 import { Timeout } from "timers";
 import "./search.scss";
 import Unknown from "../../assets/unknown.jpg";
@@ -57,7 +57,7 @@ const Search = ({ burgerActive }: SearchProps) => {
     const getData = async () => {
       setLoading(true);
       try {
-        const data = await CrudService.searchMovies(search);
+        const data = await MovieService.searchMovies(search);
 
         setData(data.results);
         if (data.length === 0) setError("Pas de résultats");

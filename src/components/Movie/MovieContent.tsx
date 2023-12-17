@@ -1,11 +1,12 @@
 import { Fragment, useContext, useEffect, useState } from "react";
 import MoviesService from "../../services/movies.service";
-import { Cast, Credits, Crew, Movie } from "../../types/movie.type";
+import { Cast, Credits, Crew, Movie, MovieFirebase } from "../../types/movie.type";
 import "./movie-content.scss";
 import { Navigation, Pagination, Scrollbar, A11y } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import Unknown from "../../assets/unknown.jpg";
 import { AuthContext } from "../../context/AuthContext";
+import UserDetailsService from "../../services/userdetails.service";
 
 export type MovieContentPropsType = {
   id: string | undefined;
@@ -21,15 +22,17 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
 
   const getMovie = async (): Promise<void> => {
     try {
+
       const res = await MoviesService.getMovieById(id as string);
       setLoading(false);
       setError(null);
-      console.log(res);
-
       setMovie(res);
+
     } catch (err: unknown) {
+
       setLoading(false);
       setError(err as string);
+
     }
   };
 
@@ -63,13 +66,20 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
 
   const getLike = async (): Promise<void> => {
     try {
-      await MoviesService.getLikeMovie(movie as Movie).then((res) => {
-        if (!res) {
-          setIsLike(false);
-          return;
-        }
-        setIsLike(true);
-      });
+      const res = await MoviesService.getMovieData(movie as Movie)
+      let movieData: MovieFirebase
+      if(res) movieData = res.data()
+
+      const userDetails = await UserDetailsService.getUserDetails(state.userInfos.uid)
+      console.log(userDetails.data());
+      
+      
+      if (movieData?.likes === 0 && !userDetails.likes?.includes(movie?.id)) {
+        setIsLike(false);
+        return;
+      }
+      setIsLike(true);
+
     } catch (err: unknown) {
       console.log(err);
     }
@@ -90,6 +100,7 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
   const likeMovie = async () => {
     try {
       await MoviesService.likeMovie(movie as Movie);
+      await UserDetailsService.toggleLikeMovie(state.user?.uid, movie as Movie);
       setIsLike(!isLike);
     } catch (err: unknown) {
       console.log(err);
@@ -115,23 +126,29 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
             <div className="top">
               <div className="movie-content__image">
                 <p className="year">{movie.release_date?.split("-")[0]}</p>
-                {!isLike ? (
-                  <img
-                    src="/heart.png"
-                    className="like"
-                    onClick={() => {
-                      state.isLogged && likeMovie();
-                    }}
-                  />
-                ) : (
-                  <img
-                    src="/heart_fill.png"
-                    className="like"
-                    onClick={() => {
-                      state.isLogged && removeLikeMovie();
-                    }}
-                  />
+
+                {state.isLogged && (
+                  <>
+                    {!isLike ? (
+                      <img
+                        src="/heart.png"
+                        className="like"
+                        onClick={() => {
+                          likeMovie();
+                        }}
+                      />
+                    ) : (
+                      <img
+                        src="/heart_fill.png"
+                        className="like"
+                        onClick={() => {
+                          removeLikeMovie();
+                        }}
+                      />
+                    )}
+                  </>
                 )}
+
                 <img
                   src={
                     movie.poster_path
