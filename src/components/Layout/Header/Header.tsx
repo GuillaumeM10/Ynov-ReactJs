@@ -4,6 +4,7 @@ import Search from "../../Search/Search";
 import { useState, useEffect, useContext } from "react";
 import Logo from "../../../assets/logo.svg";
 import { AuthContext } from "../../../context/AuthContext";
+import pp from "../../../assets/pp.webp";
 
 const Header = () => {
   const [burgerActive, setBurgerActive] = useState<boolean>(false);
@@ -31,13 +32,22 @@ const Header = () => {
         </Link>
 
         {state.isLogged ? (
-          <Link
-            to="/profile"
-            className={window.location.pathname === "/profile" ? "active primary" : "primary"}
-            onClick={() => setBurgerActive(false)}
-          >
-            Profil
-          </Link>
+          <>
+            <Link
+              to="/profile"
+              className={window.location.pathname === "/profile" ? "active primary" : "primary"}
+              onClick={() => setBurgerActive(false)}
+            >
+              Profil
+            </Link>
+            <Link
+              to="/profile"
+              onClick={() => setBurgerActive(false)}
+              className="profilePic"
+            >
+              <img width={40} height={40} className="photoURL" src={state.userInfos?.photoURL ? state.userInfos?.photoURL : pp} alt="" />
+            </Link>
+          </>
         ) : (
           <Link
             to="/authentification"

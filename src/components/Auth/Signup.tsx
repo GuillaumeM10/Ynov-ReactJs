@@ -13,10 +13,12 @@ const Signup = ({ setTabs }: signupPropsType) => {
   const [password, setPassword] = useState("");
 
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  const onSubmit = async (e: FormEvent<HTMLFormElement> | undefined) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement> | undefined) => {
     e?.preventDefault();
     setError(null);
+    setLoading(true);
 
     try {
       const newUser = await createUserWithEmailAndPassword(
@@ -28,10 +30,11 @@ const Signup = ({ setTabs }: signupPropsType) => {
 
       if (newUser.user) {
         toast.success("Inscription réussie");
+        setLoading(false);
         setTabs(false);
       }
     } catch (error: any) {
-      const errorCode = error.code;
+      const errorCode: string = error.code;
 
       if (errorCode === "auth/weak-password") {
         setError("Le mot de passe doit faire au minimum 6 caractères");
@@ -43,6 +46,7 @@ const Signup = ({ setTabs }: signupPropsType) => {
         setError("Une erreur est survenue");
         toast.error("Une erreur est survenue");
       }
+      setLoading(false);
     }
   };
 
@@ -50,34 +54,38 @@ const Signup = ({ setTabs }: signupPropsType) => {
     <form onSubmit={(e) => onSubmit(e)} className="form">
       <h1>Inscription</h1>
 
-      <div className="input">
-        <label>Email :</label>
-        <input
-          type="email"
-          value={email}
-          autoComplete="email"
-          onChange={(e) => setEmail(e.target.value)}
-        />
-      </div>
+      {loading ? <p>Inscription en cours...</p> : (
+        <>
+          <div className="input">
+            <label>Email :</label>
+            <input
+              type="email"
+              value={email}
+              autoComplete="email"
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
 
-      <div className="input">
-        <label>Password :</label>
-        <input
-          type="password"
-          value={password}
-          autoComplete="current-password"
-          onChange={(e) => setPassword(e.target.value)}
-        />
-      </div>
+          <div className="input">
+            <label>Password :</label>
+            <input
+              type="password"
+              value={password}
+              autoComplete="current-password"
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
+          {error && <p style={{ color: "red" }}>{error}</p>}
 
-      <button
-        onClick={() => onSubmit(undefined)}
-        disabled={email === "" || password === ""}
-      >
-        s'inscrire
-      </button>
+          <button
+            onClick={() => onSubmit(undefined)}
+            disabled={email === "" || password === ""}
+          >
+            s'inscrire
+          </button>
+        </>
+      )}
     </form>
   );
 };

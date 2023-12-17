@@ -27,13 +27,11 @@ const Profile = () => {
       setPhotoURL(state.userInfos.photoURL);
     }
 
-    console.log(state.userInfos);
-    
-    
   }, [state.userInfos]);
 
   const onSubmit = async(e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    
     dispatch({
       type: UPDATE_USER_INFOS,
       payload: { 
@@ -75,7 +73,6 @@ const Profile = () => {
   const verifyUser = async () => {
     try {
       const resp = await AuthService.verifyUser();
-      console.log(resp);
       setMessage({
         success: true,
         text: resp,
@@ -89,27 +86,21 @@ const Profile = () => {
     }
   }
 
-  const fetchData = async () => {
-    try {
-      const resp = await AuthService.getAuthUser();
-      console.log(resp);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   return (
     <div className="profile">
-      <h1>Bonjour {state.userInfos.email}</h1>
+      <h1>Bonjour {state.userInfos.displayName ? state.userInfos.displayName : state.userInfos.email}</h1>
       {!state.userInfos.emailVerified && (
-
-        <button
-        onClick={() => {
-          verifyUser();
-        }}
-        >
-          Envoyer un mail de vérification
-        </button>
+        <div className="send-verification-mail">
+          <p>Envoyer un mail de vérification <small><b>(une fois le mail confirmer déconnectez vous et reconnectez vous)</b></small></p>
+          <button
+          onClick={() => {
+            verifyUser();
+          }}
+          className="secondary"
+          >
+            Envoyer
+          </button>
+        </div>
       )}
       <form onSubmit={(e) => {if(state.userInfos.emailVerified) onSubmit(e)}}>
 
@@ -182,17 +173,9 @@ const Profile = () => {
         </button>
 
         {!state.userInfos.emailVerified && (
-          <p style={{ color: "red" }}>Veuillez vérifier votre adresse mail</p>
+          <p style={{ color: "red" }}>Vous ne pouvez modifier votre profil qu'après avoir vérifier votre mail.</p>
         )}
       </form>
-
-      <button
-        onClick={() => {
-          fetchData();
-        }}
-      >
-        get
-      </button>
 
       <button className="primary primary-red" onClick={logout}>Déconnexion</button>
     </div>

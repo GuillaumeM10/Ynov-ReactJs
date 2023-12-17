@@ -1,7 +1,11 @@
+import { User } from "firebase/auth";
+
+let user: User | null = JSON.parse(localStorage.getItem("user") as string);
+
 export const initState = {
-  isLogged: false,
+  isLogged: user?.uid ? true : false,
   isLoading: false,
-  userInfos: null,
+  userInfos: user?.uid ? user : null,
 };
 
 export const LOGIN = "LOGIN";
@@ -18,8 +22,7 @@ export const authReducer = (state: any, action: any) => {
         userInfos: action.payload,
       };
     case UPDATE_USER_INFOS:
-      console.log(action.payload);
-      
+      localStorage.setItem("user", JSON.stringify(action.payload));
       return {
         ...state,
         isLoading: false,
