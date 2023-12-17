@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import Header from "./Layout/Header/Header";
 import Footer from "./Layout/Footer/Footer";
 import Breadcrumb from "./Layout/Breadcrumb/Breadcrumb";
+import { Toaster } from "react-hot-toast";
 
 const Layout = ({ children }: any) => {
   const [page, setPage] = useState("");
@@ -20,6 +21,7 @@ const Layout = ({ children }: any) => {
         <Breadcrumb />
 
         {children}
+        <Toaster position="top-center" reverseOrder={false} />
       </main>
       <Footer />
     </div>

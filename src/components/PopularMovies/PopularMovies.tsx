@@ -135,7 +135,7 @@ const PopularMovies = () => {
             const nextPage = page + 1;
             setPage(nextPage);
           }}
-          className="load-more"
+          className="load-more secondary"
         >
           Charger plus
         </button>
