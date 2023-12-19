@@ -1,8 +1,11 @@
 import "./profile.scss";
 import { LOGOUT, UPDATE_USER_INFOS } from "../reducer/AuthReducer";
 import { AuthContext } from "../context/AuthContext";
+import { UserDetailsContext } from "../context/UserDetailsContext";
 import { useContext, useEffect, useState } from "react";
 import AuthService from "../services/auth.service";
+import UserDetailsService from "../services/userdetails.service";
+import { DocumentData, QueryDocumentSnapshot } from "firebase/firestore";
 
 const Profile = () => {
   const { state, dispatch } = useContext(AuthContext);
@@ -14,6 +17,7 @@ const Profile = () => {
     success: false,
     text: "",
   });
+  const { userDetail, setUserDetail } = useContext(UserDetailsContext);
 
   useEffect(() => {
     if (state.userInfos) {
@@ -27,32 +31,30 @@ const Profile = () => {
       setPhotoURL(state.userInfos.photoURL);
     }
 
+    UserDetailsService.getUserDetails(state.userInfos.uid);
   }, [state.userInfos]);
 
-  const onSubmit = async(e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     dispatch({
       type: UPDATE_USER_INFOS,
-      payload: { 
-        ...state.userInfos, 
-        email, 
-        password, 
-        displayName, 
-        photoURL
+      payload: {
+        ...state.userInfos,
+        email,
+        password,
+        displayName,
+        photoURL,
       },
     });
 
     try {
-      const resp = await AuthService.updateUser(
-        state.userInfos.uid,
-        { 
-          email, 
-          password, 
-          displayName, 
-          photoURL
-        }
-      );
+      const resp = await AuthService.updateUser(state.userInfos.uid, {
+        email,
+        password,
+        displayName,
+        photoURL,
+      });
       setMessage({
         success: true,
         text: resp,
@@ -68,6 +70,7 @@ const Profile = () => {
   const logout = () => {
     dispatch({ type: LOGOUT });
     localStorage.removeItem("user");
+    localStorage.removeItem("userDetails");
   };
 
   const verifyUser = async () => {
@@ -84,26 +87,59 @@ const Profile = () => {
         text: error as string,
       });
     }
-  }
+  };
+
+  const changeAdmin = async () => {
+    try {
+      UserDetailsService.updateUserDetails(state.userInfos.uid).then(
+        (res: QueryDocumentSnapshot<DocumentData, DocumentData>) => {
+          setUserDetail(res);
+          localStorage.setItem("userDetails", JSON.stringify(res));
+          setMessage({
+            success: true,
+            text: "L'état d'administrateur a bien été modifié",
+          });
+        }
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div className="profile">
-      <h1>Bonjour {state.userInfos.displayName ? state.userInfos.displayName : state.userInfos.email}</h1>
+      <h1>
+        Bonjour{" "}
+        {state.userInfos.displayName
+          ? state.userInfos.displayName
+          : state.userInfos.email}
+      </h1>
       {!state.userInfos.emailVerified && (
         <div className="send-verification-mail">
-          <p>Envoyer un mail de vérification <small><b>(une fois le mail confirmer déconnectez vous et reconnectez vous)</b></small></p>
+          <p>
+            Envoyer un mail de vérification{" "}
+            <small>
+              <b>
+                (une fois le mail confirmer déconnectez vous et reconnectez
+                vous)
+              </b>
+            </small>
+          </p>
           <button
-          onClick={() => {
-            verifyUser();
-          }}
-          className="secondary"
+            onClick={() => {
+              verifyUser();
+            }}
+            className="secondary"
           >
             Envoyer
           </button>
         </div>
       )}
-      <form onSubmit={(e) => {if(state.userInfos.emailVerified) onSubmit(e)}}>
-
+      <form
+        onSubmit={(e) => {
+          if (state.userInfos.emailVerified) onSubmit(e);
+        }}
+      >
         <div className="field">
           <label>Email</label>
           <input
@@ -115,7 +151,6 @@ const Profile = () => {
             onChange={(e) => setEmail(e.target.value)}
           />
         </div>
-
 
         <div className="field">
           <label>Mot de passe</label>
@@ -144,7 +179,7 @@ const Profile = () => {
 
         <div className="field">
           {photoURL && (
-            <img src={photoURL} alt="" className="photoURL" width={50}/>
+            <img src={photoURL} alt="" className="photoURL" width={50} />
           )}
           <label>Photo de profil</label>
 
@@ -159,13 +194,16 @@ const Profile = () => {
         </div>
 
         {message.text && (
-          <p className={`message ${message.success ? "success" : "error"}`} style={{ color: message.success ? "green" : "red" }}>
+          <p
+            className={`message ${message.success ? "success" : "error"}`}
+            style={{ color: message.success ? "green" : "red" }}
+          >
             {message.text}
           </p>
         )}
 
-        <button 
-          className="submit" 
+        <button
+          className="submit"
           type="submit"
           disabled={!state.userInfos.emailVerified}
         >
@@ -173,11 +211,21 @@ const Profile = () => {
         </button>
 
         {!state.userInfos.emailVerified && (
-          <p style={{ color: "red" }}>Vous ne pouvez modifier votre profil qu'après avoir vérifier votre mail.</p>
+          <p style={{ color: "red" }}>
+            Vous ne pouvez modifier votre profil qu'après avoir vérifier votre
+            mail.
+          </p>
         )}
       </form>
 
-      <button className="primary primary-red" onClick={logout}>Déconnexion</button>
+      <button className="primary primary-red" onClick={logout}>
+        Déconnexion
+      </button>
+      <button className="primary primary-green" onClick={changeAdmin}>
+        {userDetail.admin
+          ? "Vous êtes administrateur"
+          : "Devenir administrateur"}
+      </button>
     </div>
   );
 };

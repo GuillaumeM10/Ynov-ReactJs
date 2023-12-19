@@ -12,13 +12,18 @@ import {
 } from "firebase/firestore";
 import { db } from "./firebase.service";
 import { Movie } from "../types/movie.type";
-import MovieService from "./movies.service";
 
 export type UserDetailsServiceType = {
   createUserdetailsColection: (
     userId: string
   ) => Promise<DocumentReference<DocumentData, DocumentData> | undefined>;
   getUserDetails: (
+    userId: string
+  ) => Promise<QueryDocumentSnapshot<DocumentData, DocumentData>>;
+  getUserDetailsAllLikes: (
+    userId: string
+  ) => Promise<QueryDocumentSnapshot<DocumentData, DocumentData>>;
+  updateUserDetails: (
     userId: string
   ) => Promise<QueryDocumentSnapshot<DocumentData, DocumentData>>;
   toggleLikeMovie: (userId: string, movie: Movie) => Promise<void>;
@@ -28,12 +33,10 @@ const createUserdetailsColection = async (userId: string) => {
   if (!userId) return;
 
   try {
-    const userdetails = await getUserDetails(userId);
-    if (!userdetails.empty) return;
-
     const resp = await addDoc(collection(db, "userDetails"), {
       userId,
     });
+
     return resp;
   } catch (error) {
     // console.log(error);
@@ -43,10 +46,17 @@ const createUserdetailsColection = async (userId: string) => {
 
 const getUserDetails = async (userId: string) => {
   const collectionUserDetails = collection(db, "userDetails");
+  console.log(userId);
   const q = query(collectionUserDetails, where("userId", "==", userId));
+
+  if (!q) return;
 
   try {
     const querySnapshot = await getDocs(q);
+    const userDetails = querySnapshot.docs[0].data();
+    console.log(userDetails);
+    localStorage.setItem("userDetails", JSON.stringify(userDetails));
+
     return querySnapshot.docs[0];
   } catch (error) {
     console.log(error);
@@ -54,52 +64,88 @@ const getUserDetails = async (userId: string) => {
   }
 };
 
+const getUserDetailsAllLikes = async (userId: string) => {
+  const collectionUserDetails = collection(db, "userDetails");
+  console.log(userId);
+  const q = query(collectionUserDetails, where("userId", "==", userId));
 
-const toggleLikeMovie = async (userId: string, movie: Movie) => {
-  // check if movie id is in userdetails colection in "likes[]", if is in remove it if not add it
-  const movieId = movie.id;
-  const movieExists = await MovieService.getMovieData(movie);
-  
-  try{
-    const userData = await getUserDetails(userId).data();
-    console.log(userData);
-    
-    if(!userData.likes){
-      await updateDoc(doc(db, "userDetails", userData.id), {
-        likes: [movieId],
-      })
-    }else{
-      const likes = userData.likes;
+  try {
+    const querySnapshot = await getDocs(q);
+    const userDetails = querySnapshot.docs[0].data();
+    localStorage.setItem("userDetails", JSON.stringify(userDetails));
 
-      if(likes.includes(movieId)){
-        // remove like
-        await updateDoc(doc(db, "userDetails", userData.id), {
-          likes: likes.filter((id: number) => id !== movieId),
-        })
-      }else{
-        // add like
-        await updateDoc(doc(db, "userDetails", userData.id), {
-          likes: [...likes, movieId],
-        })
-      }
-    };
-
-    if(!movieExists){
-      await addDoc(collection(db, "Movies"), {
-        movieId: movie.id,
-        likes: 1,
-      });
-    }
-  }catch(error){
+    return querySnapshot.docs[0].data();
+  } catch (error) {
     console.log(error);
     throw error;
   }
-}
+};
+
+const updateUserDetails = async (userId: string) => {
+  const userDetails = await getUserDetails(userId);
+  if (!userDetails) return;
+
+  const userDetailsId = userDetails.id;
+  const isAdmin = userDetails.data().admin;
+
+  if (!isAdmin) {
+    await updateDoc(doc(db, "userDetails", userDetailsId), {
+      admin: true,
+    });
+  } else {
+    await updateDoc(doc(db, "userDetails", userDetailsId), {
+      admin: false,
+    });
+  }
+
+  return userDetails.data();
+};
+
+const toggleLikeMovie = async (userId: string, movie: Movie) => {
+  console.log(movie.id, userId);
+  const userDetails = await getUserDetails(userId);
+  if (!userDetails) return;
+
+  const userDetailsId = userDetails.id;
+  const likedMovies = userDetails.data().likes;
+
+  if (!likedMovies) {
+    await updateDoc(doc(db, "userDetails", userDetailsId), {
+      likes: [movie.id],
+    });
+    return;
+  }
+
+  //variant of includes
+  let isLiked = false;
+  for (let i = 0; i < likedMovies?.length; i++) {
+    if (likedMovies[i] === movie.id) {
+      isLiked = true;
+      break;
+    }
+  }
+  console.log(isLiked);
+  if (isLiked) {
+    await updateDoc(doc(db, "userDetails", userDetailsId), {
+      likes: likedMovies.filter((id: number) => id !== movie.id),
+    });
+  } else {
+    console.log("likedMovies", likedMovies);
+    console.log("movie.id", movie.id);
+    await updateDoc(doc(db, "userDetails", userDetailsId), {
+      likes: [...likedMovies, movie.id],
+    });
+  }
+
+  return userDetails.data();
+};
 
 const UserDetailsService: UserDetailsServiceType = {
   createUserdetailsColection,
   getUserDetails,
-  toggleLikeMovie
+  getUserDetailsAllLikes,
+  updateUserDetails,
+  toggleLikeMovie,
 };
 
 export default UserDetailsService;

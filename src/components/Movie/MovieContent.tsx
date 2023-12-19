@@ -1,12 +1,13 @@
 import { Fragment, useContext, useEffect, useState } from "react";
 import MoviesService from "../../services/movies.service";
-import { Cast, Credits, Crew, Movie, MovieFirebase } from "../../types/movie.type";
+import { Cast, Credits, Crew, Movie } from "../../types/movie.type";
 import "./movie-content.scss";
 import { Navigation, Pagination, Scrollbar, A11y } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import Unknown from "../../assets/unknown.jpg";
 import { AuthContext } from "../../context/AuthContext";
 import UserDetailsService from "../../services/userdetails.service";
+import { UserDetailsContext } from "../../context/UserDetailsContext";
 
 export type MovieContentPropsType = {
   id: string | undefined;
@@ -19,20 +20,18 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
   const [credits, setCredits] = useState<Credits>();
   const { state } = useContext(AuthContext);
   const [isLike, setIsLike] = useState(false);
+  const { userDetail, setUserDetail } = useContext(UserDetailsContext);
 
   const getMovie = async (): Promise<void> => {
     try {
-
       const res = await MoviesService.getMovieById(id as string);
       setLoading(false);
       setError(null);
       setMovie(res);
-
+      console.log(movie?.id);
     } catch (err: unknown) {
-
       setLoading(false);
       setError(err as string);
-
     }
   };
 
@@ -66,26 +65,19 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
 
   const getLike = async (): Promise<void> => {
     try {
-      const res = await MoviesService.getMovieData(movie as Movie)
-      let movieData: MovieFirebase
-      if(res) movieData = res.data()
-
-      const userDetails = await UserDetailsService.getUserDetails(state.userInfos.uid)
-      console.log(userDetails.data());
-      
-      
-      if (movieData?.likes === 0 && !userDetails.likes?.includes(movie?.id)) {
-        setIsLike(false);
-        return;
-      }
-      setIsLike(true);
-
+      userDetail?.likes?.forEach((likeMovie: number) => {
+        if (likeMovie === movie?.id) {
+          setIsLike(true);
+          return;
+        }
+      });
     } catch (err: unknown) {
       console.log(err);
     }
   };
 
   useEffect(() => {
+    setIsLike(false);
     setLoading(true);
     getMovie();
     getCredit();
@@ -100,8 +92,16 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
   const likeMovie = async () => {
     try {
       await MoviesService.likeMovie(movie as Movie);
-      await UserDetailsService.toggleLikeMovie(state.user?.uid, movie as Movie);
-      setIsLike(!isLike);
+      await UserDetailsService.toggleLikeMovie(
+        userDetail?.userId,
+        movie as Movie
+      );
+      UserDetailsService.getUserDetailsAllLikes(userDetail?.userId).then(
+        (res) => {
+          setUserDetail(res);
+        }
+      );
+      setIsLike(true);
     } catch (err: unknown) {
       console.log(err);
     }
@@ -110,7 +110,16 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
   const removeLikeMovie = async () => {
     try {
       await MoviesService.removeLikeMovie(movie as Movie);
-      setIsLike(!isLike);
+      await UserDetailsService.toggleLikeMovie(
+        userDetail?.userId,
+        movie as Movie
+      );
+      UserDetailsService.getUserDetailsAllLikes(userDetail?.userId).then(
+        (res) => {
+          setUserDetail(res);
+        }
+      );
+      setIsLike(false);
     } catch (err: unknown) {
       console.log(err);
     }

@@ -1,4 +1,4 @@
-import { FormEvent, useContext, useState } from "react";
+import { useContext, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { AuthContext } from "../../context/AuthContext";
@@ -6,10 +6,13 @@ import { auth } from "../../services/firebase.service";
 import { LOGIN } from "../../reducer/AuthReducer";
 import { toast } from "react-hot-toast";
 import AuthService from "../../services/auth.service";
+import UserDetailsService from "../../services/userdetails.service";
+import { UserDetailsContext } from "../../context/UserDetailsContext";
 
 const Signin = () => {
   const { dispatch } = useContext(AuthContext);
   const { state } = useLocation();
+  const { UserDetails, setUserDetails } = useContext(UserDetailsContext);
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
@@ -17,6 +20,8 @@ const Signin = () => {
 
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+
+  console.log(UserDetails);
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement> | undefined) => {
     e?.preventDefault();
@@ -30,26 +35,27 @@ const Signin = () => {
         password
       );
       if (userResponse.user) {
-
-        const profile = await AuthService.getAuthUser()
+        const profile = await AuthService.getAuthUser();
         setTimeout(() => {
-          dispatch({ 
-            type: LOGIN, 
+          dispatch({
+            type: LOGIN,
             payload: {
-              ...profile, 
-              ...userResponse.user
-            } 
+              ...profile,
+              ...userResponse.user,
+            },
           });
           localStorage.setItem("user", JSON.stringify(userResponse.user));
-          
+          UserDetailsService.getUserDetails(userResponse.user.uid).then(
+            (userDetails) => {
+              setUserDetails(userDetails);
+            }
+          );
           toast.success("Connexion réussie");
           setLoading(false);
           navigate(state?.from ? state.from : "/");
         }, 2000);
-
       }
     } catch (error: any) {
-
       const errorCode: string = error.code;
       if (errorCode === "auth/wrong-password") {
         setError("Le mot de passe est invalide");
@@ -70,7 +76,9 @@ const Signin = () => {
     <form onSubmit={(e) => onSubmit(e)} className="form">
       <h1>Connexion</h1>
 
-      {loading ? <p>Connexion en cours...</p> : (
+      {loading ? (
+        <p>Connexion en cours...</p>
+      ) : (
         <>
           <div className="input">
             <label>Email :</label>
@@ -79,7 +87,7 @@ const Signin = () => {
               value={email}
               autoComplete="email"
               onChange={(e) => setEmail(e.target.value)}
-              />
+            />
           </div>
 
           <div className="input">
@@ -89,7 +97,7 @@ const Signin = () => {
               value={password}
               autoComplete="current-password"
               onChange={(e) => setPassword(e.target.value)}
-              />
+            />
           </div>
 
           {error && <p style={{ color: "red" }}>{error}</p>}
@@ -97,7 +105,7 @@ const Signin = () => {
           <button
             onClick={() => onSubmit(undefined)}
             disabled={email === "" || password === ""}
-            >
+          >
             se connecter
           </button>
         </>
