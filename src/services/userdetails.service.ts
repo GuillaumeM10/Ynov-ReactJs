@@ -19,14 +19,14 @@ export type UserDetailsServiceType = {
   ) => Promise<DocumentReference<DocumentData, DocumentData> | undefined>;
   getUserDetails: (
     userId: string
-  ) => Promise<QueryDocumentSnapshot<DocumentData, DocumentData>>;
+  ) => Promise<QueryDocumentSnapshot<DocumentData, DocumentData> | void>;
   getUserDetailsAllLikes: (
     userId: string
-  ) => Promise<QueryDocumentSnapshot<DocumentData, DocumentData>>;
+  ) => Promise<DocumentData>;
   updateUserDetails: (
     userId: string
-  ) => Promise<QueryDocumentSnapshot<DocumentData, DocumentData>>;
-  toggleLikeMovie: (userId: string, movie: Movie) => Promise<void>;
+  ) => Promise<DocumentData | void>;
+  toggleLikeMovie: (userId: string, movie: Movie) => Promise<void | DocumentData>;
 };
 
 const createUserdetailsColection = async (userId: string) => {

@@ -17,9 +17,9 @@ import {
 
 export type MovieServiceType = {
   popularMovies: (page?: number) => Promise<Movies>;
-  getMovieById: (id: string) => Promise<Movie>;
+  getMovieById: (id: number) => Promise<Movie>;
   searchMovies: (query: string) => Promise<Movies>;
-  getCredits: (id: string) => Promise<any>;
+  getCredits: (id: number) => Promise<any>;
   getMovieData: (movie: Movie) => Promise<QueryDocumentSnapshot<DocumentData, DocumentData> | false> ;
   likeMovie: (movie: Movie) => Promise<DocumentReference<DocumentData, DocumentData>>;
   removeLikeMovie: (movie: Movie) => Promise<void>;
@@ -38,7 +38,7 @@ const popularMovies = async (page?: number) => {
   }
 };
 
-const getMovieById = async (id: string) => {
+const getMovieById = async (id: number) => {
   try {
     return (await api.get(`/movie/${id}`)).data;
   } catch (err) {
@@ -54,7 +54,7 @@ const searchMovies = async (query: string) => {
   }
 };
 
-const getCredits = async (id: string) => {
+const getCredits = async (id: number) => {
   try {
     return (await api.get(`/movie/${id}/credits`)).data;
   } catch (err) {

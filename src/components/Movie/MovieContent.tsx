@@ -10,7 +10,7 @@ import UserDetailsService from "../../services/userdetails.service";
 import { UserDetailsContext } from "../../context/UserDetailsContext";
 
 export type MovieContentPropsType = {
-  id: string | undefined;
+  id: number;
 };
 
 const MovieContent = ({ id }: MovieContentPropsType) => {
@@ -24,11 +24,10 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
 
   const getMovie = async (): Promise<void> => {
     try {
-      const res = await MoviesService.getMovieById(id as string);
+      const res = await MoviesService.getMovieById(id);
       setLoading(false);
       setError(null);
       setMovie(res);
-      console.log(movie?.id);
     } catch (err: unknown) {
       setLoading(false);
       setError(err as string);
@@ -37,7 +36,7 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
 
   const getCredit = async (): Promise<void> => {
     try {
-      const res = await MoviesService.getCredits(id as string);
+      const res = await MoviesService.getCredits(id);
       setLoading(false);
       setError(null);
 

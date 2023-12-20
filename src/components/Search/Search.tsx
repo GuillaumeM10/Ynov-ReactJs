@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 import { Movie } from "../../types/movie.type";
 import { useState, useEffect, useRef } from "react";
 import MovieService from "../../services/movies.service";
-import { Timeout } from "timers";
 import "./search.scss";
 import Unknown from "../../assets/unknown.jpg";
 
@@ -12,11 +11,11 @@ export interface SearchProps {
 
 const Search = ({ burgerActive }: SearchProps) => {
   const [search, setSearch] = useState("");
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(false);
   const [focused, setFocused] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const resultsRef = useRef<JSX.IntrinsicElements.div>(null);
+  const resultsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: any) => {
@@ -40,7 +39,7 @@ const Search = ({ burgerActive }: SearchProps) => {
   };
 
   const debounce = (func: any) => {
-    let timer: Timeout | null;
+    let timer: NodeJS.Timeout | null;
     return (...args: any[]) => {
       const context: any = this;
       if (timer) clearTimeout(timer);
@@ -60,7 +59,7 @@ const Search = ({ burgerActive }: SearchProps) => {
         const data = await MovieService.searchMovies(search);
 
         setData(data.results);
-        if (data.length === 0) setError("Pas de résultats");
+        if (data.results.length === 0) setError("Pas de résultats");
         else setError("");
       } catch (error) {
         console.log(error as string);

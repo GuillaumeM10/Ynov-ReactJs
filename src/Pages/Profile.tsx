@@ -5,7 +5,6 @@ import { UserDetailsContext } from "../context/UserDetailsContext";
 import { useContext, useEffect, useState } from "react";
 import AuthService from "../services/auth.service";
 import UserDetailsService from "../services/userdetails.service";
-import { DocumentData, QueryDocumentSnapshot } from "firebase/firestore";
 
 const Profile = () => {
   const { state, dispatch } = useContext(AuthContext);
@@ -91,16 +90,13 @@ const Profile = () => {
 
   const changeAdmin = async () => {
     try {
-      UserDetailsService.updateUserDetails(state.userInfos.uid).then(
-        (res: QueryDocumentSnapshot<DocumentData, DocumentData>) => {
-          setUserDetail(res);
-          localStorage.setItem("userDetails", JSON.stringify(res));
-          setMessage({
-            success: true,
-            text: "L'état d'administrateur a bien été modifié",
-          });
-        }
-      );
+      const res = UserDetailsService.updateUserDetails(state.userInfos.uid)
+      setUserDetail(res);
+      localStorage.setItem("userDetails", JSON.stringify(res));
+      setMessage({
+        success: true,
+        text: "L'état d'administrateur a bien été modifié",
+      });
     } catch (error) {
       console.log(error);
     }

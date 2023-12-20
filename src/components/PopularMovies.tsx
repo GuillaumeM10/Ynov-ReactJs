@@ -22,7 +22,7 @@ const PopularMovies = () => {
       const res = await MovieService.popularMovies(page);
       setLoading(false);
       setError(null);
-      setMovies(res.data);
+      setMovies(res);
     } catch (err: unknown) {
       setLoading(false);
       setError(err as string);

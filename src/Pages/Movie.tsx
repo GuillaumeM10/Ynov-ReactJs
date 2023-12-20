@@ -3,10 +3,14 @@ import MovieContent from "../components/Movie/MovieContent";
 
 const Movie = () => {
   const { id } = useParams();
+  if(!id) return
+  const numberId: number = parseInt(id);
 
   return (
     <div className="movie">
-      <MovieContent id={id} />
+      { id && (
+        <MovieContent id={numberId} />
+      )}
     </div>
   );
 };
