@@ -13,13 +13,16 @@ export interface UserDetailsType {
   }[];
 }
 
+export interface MovieComment{
+  id: string;
+  userId: string;
+  displayName?: string;
+  photoURL?: string;
+  text: string;
+}
 export interface MoviesColection {
   movieId: string;
   likes: number;
   rates: number[];
-  comments: {
-    id: string;
-    userId: string;
-    text: string;
-  }[];
+  comments: MovieComment[];
 }

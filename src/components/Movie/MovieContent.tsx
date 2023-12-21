@@ -333,7 +333,9 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
               </Swiper>
             </div>
 
-            <CreateComment movie={movie} />
+            {state.isLogged && state.userInfos &&(
+              <CreateComment movie={movie} userInfos={state.userInfos} />
+            )}
 
             <MovieComments movie={movie} />
           </div>

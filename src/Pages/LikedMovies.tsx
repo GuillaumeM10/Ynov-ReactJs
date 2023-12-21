@@ -3,8 +3,6 @@ import './likedMovies.scss';
 import { AuthContext } from '../context/AuthContext';
 import { Movie } from '../types/movie.type';
 import MovieService from '../services/movies.service';
-import Unknown from "../assets/unknown.jpg";
-import { Link } from 'react-router-dom';
 import MovieCard from '../components/Movie/MovieCard';
 
 const LikedMovies = () => {

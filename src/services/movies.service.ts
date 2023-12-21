@@ -1,3 +1,4 @@
+import { MovieComment } from "../types/colections.type";
 import { Credits, Movie, Movies } from "../types/movie.type";
 import api from "./api.service";
 import { db } from "./firebase.service";
@@ -31,7 +32,7 @@ export type MovieServiceType = {
 
   removeLikeMovie: (movie: Movie) => Promise<void>;
 
-  addComment: (movie: Movie, userId: string, text: string, id: string) => Promise<DocumentReference<DocumentData, DocumentData> | void>;
+  addComment: (movie: Movie, userId: string, displayName: string | null, photoURL: string | null, text: string, id: string) => Promise<DocumentReference<DocumentData, DocumentData> | void>;
   
   removeComment: (movie: Movie, id: string) => Promise<DocumentReference<DocumentData, DocumentData> | void>;
   
@@ -138,23 +139,61 @@ const removeLikeMovie = async (movie: Movie) => {
 //   movieId: string;
 //   likes: number;
 //   rates: number[];
-//   comments: {
-//     id: string;
-//     userId: string;
-//     text: string;
-//   }[];
+  // comments: {
+  //   id: string;
+  //   displayName?: string;
+  //   photoURL?: string;
+  //   text: string;
+  // }[];
 // }
 
-const addComment = async (movie: Movie, userId: string, text: string, id: string) => {
+const addComment = async (
+  movie: Movie, 
+  userId: string, 
+  displayName: string | null, 
+  photoURL: string | null, 
+  text: string,
+  id: string
+) => {
   try {
     const movieExists = await getMovieData(movie);
-
     if (movieExists) {
       const movieRef = doc(db, "Movies", movieExists.id);
-      await updateDoc(movieRef, {
-        comments: [...movieExists.data().comments, { userId, text, id }],
-      });
+      if(movieExists.data().comments){
+        await updateDoc(movieRef, {
+          comments: [...movieExists.data().comments, { 
+            userId,
+            displayName,
+            photoURL,
+            text, 
+            id 
+          }],
+        });
+      }else{
+        await updateDoc(movieRef, {
+          comments: [{ 
+            userId,
+            displayName,
+            photoURL,
+            text, 
+            id 
+          }],
+        });
+      }
       return movieRef;
+    }else{
+      const docRef = await addDoc(collection(db, "Movies"), {
+        movieId: movie.id,
+        comments: [
+          {
+            displayName,
+            photoURL,
+            text, 
+            id 
+          }
+        ],
+      });
+      return docRef;
     }
   } catch (error) {
     console.log(error);
@@ -169,7 +208,7 @@ const removeComment = async (movie: Movie, id: string) => {
       const movieRef = doc(db, "Movies", movieExists.id);
       
       await updateDoc(movieRef, {
-        comments: movieExists.data().comments.filter((comment: any) => comment.id !== id),
+        comments: movieExists.data().comments.filter((comment: MovieComment) => comment.id !== id),
       });
       return movieRef;
     }

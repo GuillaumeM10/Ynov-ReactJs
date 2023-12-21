@@ -1,9 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import MoviesService from "../../services/movies.service";
-import { Link } from "react-router-dom";
 import { FetchMovies, Movie } from "../../types/movie.type";
 import "./popularMovies.scss";
-import Unknown from "../../assets/unknown.jpg";
 import ScrollTop from "../ScrollTop";
 import Loading from "../../assets/loading.svg";
 import MovieCard from "../Movie/MovieCard";
@@ -100,7 +98,7 @@ const PopularMovies = () => {
       <ul className="popular-movies-list">
         {movies && movies.length > 0 ? (
           movies.map((movie: Movie) => {
-            return (<MovieCard movie={movie} />);
+            return (<MovieCard movie={movie} key={movie.id} />);
           })
         ) : (
           <p>No movies found</p>

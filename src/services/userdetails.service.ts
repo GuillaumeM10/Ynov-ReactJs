@@ -32,9 +32,9 @@ export type UserDetailsServiceType = {
 
   toggleIsAdmin: (userId: string, isAdmin: boolean) => Promise<DocumentData | void>;
 
-  addComments: (userId: string, movie: Movie, text: string, id: string) => Promise<DocumentData | void>;
+  addComment: (userId: string, movie: Movie, text: string, id: string) => Promise<DocumentData | void>;
 
-  removeComments: (userId: string, id: string) => Promise<DocumentData | void>;
+  removeComment: (userId: string, id: string) => Promise<DocumentData | void>;
 
 };
 
@@ -158,7 +158,13 @@ const toggleIsAdmin = async (userId: string, isAdmin: boolean) => {
 //   }[];
 // }
 
-const addComments = async (userId: string, movie: Movie, text: string, id: string) => {
+const addComment = async (
+  userId: string, 
+  movie: Movie, 
+  text: string, 
+  id: string
+) => {
+
   try{
     const userDetails = await getUserDetails(userId);
     if (!userDetails) return;
@@ -166,25 +172,37 @@ const addComments = async (userId: string, movie: Movie, text: string, id: strin
     const userDetailsId = userDetails.id;
     const userDetailsData = userDetails.data();
 
-    await updateDoc(doc(db, "userDetails", userDetailsId), {
-      ...userDetailsData,
-      comments: [
-        ...userDetailsData.comments,
-        {
-          movieId: movie.id,
-          text,
-          id
-        }
-      ]
-    });
-
+    if(userDetailsData.comments){
+      await updateDoc(doc(db, "userDetails", userDetailsId), {
+        ...userDetailsData,
+        comments: [
+          ...userDetailsData.comments,
+          {
+            movieId: movie.id,
+            text,
+            id
+          }
+        ]
+      });
+    }else{
+      await updateDoc(doc(db, "userDetails", userDetailsId), {
+        ...userDetailsData,
+        comments: [
+          {
+            movieId: movie.id,
+            text,
+            id
+          }
+        ]
+      });
+    }
     return userDetails.data();
   }catch (error) {
     console.log(error);
   }
 }
 
-const removeComments = async (userId: string, id: string) => {
+const removeComment = async (userId: string, id: string) => {
   try{
     const userDetails = await getUserDetails(userId);
     if (!userDetails) return;
@@ -210,8 +228,8 @@ const UserDetailsService: UserDetailsServiceType = {
   updateUserDetails,
   toggleLikeMovie,
   toggleIsAdmin,
-  addComments,
-  removeComments
+  addComment,
+  removeComment
 };
 
 export default UserDetailsService;
