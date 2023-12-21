@@ -50,8 +50,6 @@ const Signin = () => {
             },
           });
           
-          // setUserDetails(userDetails);
-
           toast.success("Connexion réussie");
           setLoading(false);
           navigate(state?.from ? state.from : "/");
