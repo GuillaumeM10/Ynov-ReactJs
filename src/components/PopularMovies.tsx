@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import MovieService from "../services/movies.service";
 import { Link } from "react-router-dom";
-import { Movies } from "../types/movie.type";
+import { Movie, Movies } from "../types/movie.type";
+import Loading from "../assets/loading.svg";
 
 const PopularMovies = () => {
   const [movies, setMovies] = useState<Movies>();
@@ -64,11 +65,11 @@ const PopularMovies = () => {
 
   return (
     <div className="popular-movies">
-      <p>Popular Movies</p>
+      <p>Films populaires</p>
 
       <div className="popular-movies-list">
         {movies && !loading && movies.results?.length > 0 ? (
-          movies.results.map((movie: any) => {
+          movies.results.map((movie: Movie) => {
             return (
               <Link
                 className="popular-movie"
@@ -80,10 +81,14 @@ const PopularMovies = () => {
             );
           })
         ) : (
-          <p>No movies found</p>
+          <p>Aucun films trouvé</p>
         )}
       </div>
-      {loading && <p>Loading</p>}
+      {loading && <img 
+        className="loading"
+        src={Loading} 
+        alt="loading"
+      />}
       {error && <p>{error}</p>}
     </div>
   );

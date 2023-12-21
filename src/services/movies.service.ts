@@ -1,4 +1,4 @@
-import { Movie, Movies } from "../types/movie.type";
+import { Credits, Movie, Movies } from "../types/movie.type";
 import api from "./api.service";
 import { db } from "./firebase.service";
 import {
@@ -19,7 +19,7 @@ export type MovieServiceType = {
   popularMovies: (page?: number) => Promise<Movies>;
   getMovieById: (id: number) => Promise<Movie>;
   searchMovies: (query: string) => Promise<Movies>;
-  getCredits: (id: number) => Promise<any>;
+  getCredits: (id: number) => Promise<Credits>;
   getMovieData: (movie: Movie) => Promise<QueryDocumentSnapshot<DocumentData, DocumentData> | false> ;
   likeMovie: (movie: Movie) => Promise<DocumentReference<DocumentData, DocumentData>>;
   removeLikeMovie: (movie: Movie) => Promise<void>;

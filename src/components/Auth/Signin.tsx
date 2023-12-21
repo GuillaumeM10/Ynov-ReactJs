@@ -7,12 +7,10 @@ import { LOGIN } from "../../reducer/AuthReducer";
 import { toast } from "react-hot-toast";
 import AuthService from "../../services/auth.service";
 import UserDetailsService from "../../services/userdetails.service";
-import { UserDetailsContext } from "../../context/UserDetailsContext";
 
 const Signin = () => {
   const { dispatch } = useContext(AuthContext);
   const { state } = useLocation();
-  const { UserDetails, setUserDetails } = useContext(UserDetailsContext);
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
@@ -21,7 +19,6 @@ const Signin = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
-  console.log(UserDetails);
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement> | undefined) => {
     e?.preventDefault();
@@ -36,20 +33,25 @@ const Signin = () => {
       );
       if (userResponse.user) {
         const profile = await AuthService.getAuthUser();
+        const userDetails = await UserDetailsService.getUserDetails(userResponse.user.uid)
+        const userDetailsData = userDetails && userDetails.data()
+
         setTimeout(() => {
           dispatch({
             type: LOGIN,
             payload: {
-              ...profile,
-              ...userResponse.user,
+              userInfos: {
+                ...profile,
+                ...userResponse.user,
+              },
+              userDetails: {
+                ...userDetailsData,
+              }
             },
           });
-          localStorage.setItem("user", JSON.stringify(userResponse.user));
-          UserDetailsService.getUserDetails(userResponse.user.uid).then(
-            (userDetails) => {
-              setUserDetails(userDetails);
-            }
-          );
+          
+          // setUserDetails(userDetails);
+
           toast.success("Connexion réussie");
           setLoading(false);
           navigate(state?.from ? state.from : "/");

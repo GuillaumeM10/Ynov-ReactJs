@@ -5,7 +5,11 @@ import Footer from "./Layout/Footer/Footer";
 import Breadcrumb from "./Layout/Breadcrumb/Breadcrumb";
 import { Toaster } from "react-hot-toast";
 
-const Layout = ({ children }: any) => {
+export type LayoutPropsType = {
+  children: React.ReactNode;
+};
+
+const Layout = ({ children }: LayoutPropsType) => {
   const [page, setPage] = useState("");
   const location = useLocation();
 

@@ -5,6 +5,7 @@ import { FetchMovies, Movie } from "../../types/movie.type";
 import "./popularMovies.scss";
 import Unknown from "../../assets/unknown.jpg";
 import ScrollTop from "../ScrollTop";
+import Loading from "../../assets/loading.svg";
 
 const PopularMovies = () => {
   const [movies, setMovies] = useState<Array<Movie>>([]);
@@ -128,7 +129,13 @@ const PopularMovies = () => {
         )}
       </ul>
       {loading ? (
-        <p className="loading">Loading</p>
+        <img 
+          className="loading"
+          src={Loading} 
+          alt="loading"
+          width={40}
+          height={40}
+        />
       ) : (
         <button
           onClick={() => {

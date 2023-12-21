@@ -5,12 +5,15 @@ import NotFound from "../Pages/NotFound";
 import Auth from "../Pages/Auth";
 import ProtectedRoute from "./ProtectedRoute";
 import Profile from "../Pages/Profile";
+import LikedMovies from "../Pages/LikedMovies";
 
 const Router = () => {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
+
       <Route path="film/:id" element={<Movie />} />
+
       <Route
         path="/authentification"
         element={
@@ -19,7 +22,7 @@ const Router = () => {
           </ProtectedRoute>
         }
       />
-      <Route path="*" element={<NotFound />} />
+
       <Route
         path="/profile"
         element={
@@ -28,6 +31,18 @@ const Router = () => {
           </ProtectedRoute>
         }
       />
+
+      <Route
+        path="/favoris"
+        element={
+          <ProtectedRoute to="/" bool={false}>
+            <LikedMovies />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route path="*" element={<NotFound />} />
+
     </Routes>
   );
 };

@@ -5,9 +5,10 @@ import "./movie-content.scss";
 import { Navigation, Pagination, Scrollbar, A11y } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import Unknown from "../../assets/unknown.jpg";
+import Loading from "../../assets/loading.svg";
 import { AuthContext } from "../../context/AuthContext";
 import UserDetailsService from "../../services/userdetails.service";
-import { UserDetailsContext } from "../../context/UserDetailsContext";
+import { UPDATE_USER_INFOS } from "../../reducer/AuthReducer";
 
 export type MovieContentPropsType = {
   id: number;
@@ -19,8 +20,9 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
   const [error, setError] = useState<string | null>(null);
   const [credits, setCredits] = useState<Credits>();
   const { state } = useContext(AuthContext);
+  const { dispatch } = useContext(AuthContext);
   const [isLike, setIsLike] = useState(false);
-  const { userDetail, setUserDetail } = useContext(UserDetailsContext);
+  const [loadingLike, setLoadingLike] = useState(true);
 
   const getMovie = async (): Promise<void> => {
     try {
@@ -64,14 +66,12 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
 
   const getLike = async (): Promise<void> => {
     try {
-      userDetail?.likes?.forEach((likeMovie: number) => {
-        if (likeMovie === movie?.id) {
-          setIsLike(true);
-          return;
-        }
-      });
+      if(!state.userDetails?.likes) return;
+      setIsLike(state.userDetails?.likes?.includes(movie?.id as number))
+      setLoadingLike(false)
     } catch (err: unknown) {
       console.log(err);
+      setLoadingLike(false)
     }
   };
 
@@ -88,41 +88,37 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
     }
   }, [movie]);
 
-  const likeMovie = async () => {
+  const toggleLikeMovie = async () => {
+    setLoadingLike(true);
     try {
+      if(!state.userDetails?.userId) return;
       await MoviesService.likeMovie(movie as Movie);
       await UserDetailsService.toggleLikeMovie(
-        userDetail?.userId,
+        state.userDetails?.userId,
         movie as Movie
       );
-      UserDetailsService.getUserDetailsAllLikes(userDetail?.userId).then(
-        (res) => {
-          setUserDetail(res);
-        }
-      );
-      setIsLike(true);
+      const updateUserDetails = await UserDetailsService.updateUserDetails(state.userDetails?.userId)
+      
+      dispatch({
+        type: UPDATE_USER_INFOS,
+        payload: {
+          userInfos: state.userInfos,
+          userDetails : {
+            ...updateUserDetails
+          }
+        },
+      })
+      if(updateUserDetails?.likes){
+        setIsLike(updateUserDetails?.likes?.includes(movie?.id as number) ? true : false);
+      }else{
+        setIsLike(false);
+      }
+      setLoadingLike(false);
     } catch (err: unknown) {
       console.log(err);
+      setLoadingLike(false);
     }
-  };
-
-  const removeLikeMovie = async () => {
-    try {
-      await MoviesService.removeLikeMovie(movie as Movie);
-      await UserDetailsService.toggleLikeMovie(
-        userDetail?.userId,
-        movie as Movie
-      );
-      UserDetailsService.getUserDetailsAllLikes(userDetail?.userId).then(
-        (res) => {
-          setUserDetail(res);
-        }
-      );
-      setIsLike(false);
-    } catch (err: unknown) {
-      console.log(err);
-    }
-  };
+  }
 
   return (
     <Fragment>
@@ -136,25 +132,31 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
                 <p className="year">{movie.release_date?.split("-")[0]}</p>
 
                 {state.isLogged && (
-                  <>
-                    {!isLike ? (
-                      <img
-                        src="/heart.png"
-                        className="like"
-                        onClick={() => {
-                          likeMovie();
-                        }}
-                      />
+                  <Fragment>
+                    {loadingLike ? (
+                      <img src={Loading} className="like loading" />
                     ) : (
-                      <img
-                        src="/heart_fill.png"
-                        className="like"
-                        onClick={() => {
-                          removeLikeMovie();
-                        }}
-                      />
+                      <Fragment>
+                        {!isLike ? (
+                          <img
+                            src="/heart.png"
+                            className="like"
+                            onClick={() => {
+                              toggleLikeMovie();
+                            }}
+                          />
+                        ) : (
+                          <img
+                            src="/heart_fill.png"
+                            className="like"
+                            onClick={() => {
+                              toggleLikeMovie();
+                            }}
+                          />
+                        )}
+                      </Fragment>
                     )}
-                  </>
+                  </Fragment>
                 )}
 
                 <img

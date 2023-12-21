@@ -18,8 +18,8 @@ const Search = ({ burgerActive }: SearchProps) => {
   const resultsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handleClickOutside = (event: any) => {
-      if (resultsRef.current && !resultsRef.current.contains(event.target)) {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (resultsRef.current && !resultsRef.current.contains(event.target as Node)) {
         setFocused(false);
       }
     };
@@ -34,14 +34,14 @@ const Search = ({ burgerActive }: SearchProps) => {
     setFocused(true);
   };
 
-  const handleSearch = (e: any) => {
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
   };
 
-  const debounce = (func: any) => {
+  const debounce = (func: (...args: any[]) => void): ((...args: any[]) => void) => {
     let timer: NodeJS.Timeout | null;
     return (...args: any[]) => {
-      const context: any = this;
+      const context: undefined = this;
       if (timer) clearTimeout(timer);
       timer = setTimeout(() => {
         timer = null;

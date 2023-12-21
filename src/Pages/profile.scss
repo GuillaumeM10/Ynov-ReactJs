@@ -44,6 +44,22 @@
         color: white;
       }
     }
+
+    &-checkbox{
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 1rem;
+      font-size: 1.2em;
+      font-weight: 600;
+      color: white;
+
+      input{
+        width: 2rem;
+        height: 2rem;
+        margin: 0;
+      }
+    }
   }
 
   button:not(.burger){
@@ -72,4 +88,5 @@
 .photoURL{
   border-radius: 50%;
   border: solid 2px rgb(255, 255, 255);
+  object-fit: cover;
 }
