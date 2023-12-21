@@ -1,8 +1,7 @@
 import { Link } from "react-router-dom";
 import { Movie } from "../../types/movie.type";
 import { useState, useEffect, useRef } from "react";
-import CrudService from "../../services/movies.service";
-import { Timeout } from "timers";
+import MovieService from "../../services/movies.service";
 import "./search.scss";
 import Unknown from "../../assets/unknown.jpg";
 
@@ -12,15 +11,15 @@ export interface SearchProps {
 
 const Search = ({ burgerActive }: SearchProps) => {
   const [search, setSearch] = useState("");
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(false);
   const [focused, setFocused] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const resultsRef = useRef<JSX.IntrinsicElements.div>(null);
+  const resultsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handleClickOutside = (event: any) => {
-      if (resultsRef.current && !resultsRef.current.contains(event.target)) {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (resultsRef.current && !resultsRef.current.contains(event.target as Node)) {
         setFocused(false);
       }
     };
@@ -35,14 +34,14 @@ const Search = ({ burgerActive }: SearchProps) => {
     setFocused(true);
   };
 
-  const handleSearch = (e: any) => {
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
   };
 
-  const debounce = (func: any) => {
-    let timer: Timeout | null;
+  const debounce = (func: (...args: any[]) => void): ((...args: any[]) => void) => {
+    let timer: NodeJS.Timeout | null;
     return (...args: any[]) => {
-      const context: any = this;
+      const context: undefined = this;
       if (timer) clearTimeout(timer);
       timer = setTimeout(() => {
         timer = null;
@@ -57,10 +56,10 @@ const Search = ({ burgerActive }: SearchProps) => {
     const getData = async () => {
       setLoading(true);
       try {
-        const data = await CrudService.searchMovies(search);
+        const data = await MovieService.searchMovies(search);
 
         setData(data.results);
-        if (data.length === 0) setError("Pas de résultats");
+        if (data.results.length === 0) setError("Pas de résultats");
         else setError("");
       } catch (error) {
         console.log(error as string);

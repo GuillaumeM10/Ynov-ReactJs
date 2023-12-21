@@ -2,14 +2,15 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Fragment, useState, useEffect } from "react";
 import "./breadcrum.scss";
 import MoviesService from "../../../services/movies.service";
+import { Movie } from "../../../types/movie.type";
 
 const Breadcrumb = () => {
   const { pathname } = useLocation();
   const pathnames = pathname.split("/").filter((x) => x);
   const navigate = useNavigate();
-  const [nameMovie, setNameMovie] = useState<string>("");
+  const [nameMovie, setNameMovie] = useState<Movie["title"]>("");
 
-  const getMovie = async (id: string): Promise<void> => {
+  const getMovie = async (id: number): Promise<void> => {
     try {
       const res = await MoviesService.getMovieById(id);
       setNameMovie(res.title);
@@ -22,7 +23,7 @@ const Breadcrumb = () => {
     if (pathnames.length > 0) {
       const last = pathnames[pathnames.length - 1];
       if (Number(last)) {
-        getMovie(last);
+        getMovie(last as unknown as number);
       }
     }
   }, [pathname]);

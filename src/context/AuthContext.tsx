@@ -10,7 +10,12 @@ const defaultValueType = {
   dispatch: () => null,
 };
 
-const AuthContext = createContext<any>(defaultValueType);
+export type AuthContextType = {
+  state: typeof defaultValueType.state;
+  dispatch: React.Dispatch<any>;
+};
+
+const AuthContext = createContext<AuthContextType>(defaultValueType);
 
 const AuthProvider = ({ children }: AuthProviderProps) => {
   const [state, dispatch] = useReducer(authReducer, initState);

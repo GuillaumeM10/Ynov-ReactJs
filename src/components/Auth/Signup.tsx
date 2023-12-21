@@ -54,7 +54,9 @@ const Signup = ({ setTabs }: signupPropsType) => {
     <form onSubmit={(e) => onSubmit(e)} className="form">
       <h1>Inscription</h1>
 
-      {loading ? <p>Inscription en cours...</p> : (
+      {loading ? (
+        <p>Inscription en cours...</p>
+      ) : (
         <>
           <div className="input">
             <label>Email :</label>

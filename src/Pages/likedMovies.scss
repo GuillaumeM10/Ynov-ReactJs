@@ -1,7 +1,7 @@
-.popular-movies {
+.liked-movies {
   position: relative;
 
-  &-list {
+  .movies {
     display: flex;
     gap: 20px;
     flex-wrap: wrap;
@@ -10,7 +10,7 @@
     width: 100%;
   }
 
-  .popular-movie-card {
+  .movie-card {
     width: calc(100% / 3 - 15px);
     position: relative;
 
@@ -78,7 +78,7 @@
     }
   }
 
-  .popular-movies-infos {
+  .movies-infos {
     background-color: #3f3e3e;
     color: #9f9f9f;
     border-radius: 1rem;
@@ -100,9 +100,5 @@
         margin: .5rem;
       }
     }
-  }
-
-  .loading{
-    width: 100%;
   }
 }

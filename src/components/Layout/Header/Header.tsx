@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import "./header.scss";
 import Search from "../../Search/Search";
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, Fragment } from "react";
 import Logo from "../../../assets/logo.svg";
 import { AuthContext } from "../../../context/AuthContext";
 import pp from "../../../assets/pp.webp";
@@ -32,7 +32,18 @@ const Header = () => {
         </Link>
 
         {state.isLogged ? (
-          <>
+          <Fragment>
+            {state.userDetails?.likes?.length ? (
+              <Link
+                to="/favoris"
+                className={
+                  window.location.pathname === "/favoris" ? "active primary" : "primary"
+                }
+                onClick={() => setBurgerActive(false)}
+              >
+                Favoris
+              </Link>
+            ) : null}
             <Link
               to="/profile"
               className={window.location.pathname === "/profile" ? "active primary" : "primary"}
@@ -47,7 +58,7 @@ const Header = () => {
             >
               <img width={40} height={40} className="photoURL" src={state.userInfos?.photoURL ? state.userInfos?.photoURL : pp} alt="" />
             </Link>
-          </>
+          </Fragment>
         ) : (
           <Link
             to="/authentification"

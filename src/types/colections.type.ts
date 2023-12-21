@@ -1,9 +1,15 @@
 export interface UserDetailsType {
   admin: boolean;
-  pseudo: string;
-  ratesId: string;
   userId: string;
-  likes: string[];
+  likes?: number[];
+  rates?: {
+    movieId: number;
+    rate: number;
+  }[];
+  comments?: {
+    movieId: number;
+    text: string;
+  }[];
 }
 
 export interface MobiesColection {
