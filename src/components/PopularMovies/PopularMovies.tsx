@@ -6,6 +6,7 @@ import "./popularMovies.scss";
 import Unknown from "../../assets/unknown.jpg";
 import ScrollTop from "../ScrollTop";
 import Loading from "../../assets/loading.svg";
+import MovieCard from "../Movie/MovieCard";
 
 const PopularMovies = () => {
   const [movies, setMovies] = useState<Array<Movie>>([]);
@@ -99,30 +100,7 @@ const PopularMovies = () => {
       <ul className="popular-movies-list">
         {movies && movies.length > 0 ? (
           movies.map((movie: Movie) => {
-            const year = movie.release_date?.split("-")[0];
-            return (
-              <li
-                key={movie.id}
-                id={movie.id?.toString()}
-                className="popular-movie-card"
-              >
-                <Link to={"/film/" + movie.id}>
-                  <div className="data">
-                    <p className="year">{year}</p>
-                    <p className="title">{movie.title}</p>
-                  </div>
-                  <img
-                    src={
-                      movie.poster_path
-                        ? "https://image.tmdb.org/t/p/w500/" + movie.poster_path
-                        : Unknown
-                    }
-                    className="popular-movie-img"
-                    alt=""
-                  />
-                </Link>
-              </li>
-            );
+            return (<MovieCard movie={movie} />);
           })
         ) : (
           <p>No movies found</p>

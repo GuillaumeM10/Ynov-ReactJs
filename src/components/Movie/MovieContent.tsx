@@ -9,6 +9,8 @@ import Loading from "../../assets/loading.svg";
 import { AuthContext } from "../../context/AuthContext";
 import UserDetailsService from "../../services/userdetails.service";
 import { UPDATE_USER_INFOS } from "../../reducer/AuthReducer";
+import MovieComments from "../Comments/MovieComments";
+import CreateComment from "../Comments/CreateComment";
 
 export type MovieContentPropsType = {
   id: number;
@@ -330,6 +332,10 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
                   ))}
               </Swiper>
             </div>
+
+            <CreateComment movie={movie} />
+
+            <MovieComments movie={movie} />
           </div>
         )
       )}
