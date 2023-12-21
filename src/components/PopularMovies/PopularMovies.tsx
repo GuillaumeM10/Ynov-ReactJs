@@ -3,6 +3,9 @@ import MoviesService from "../../services/movies.service";
 import { Link } from "react-router-dom";
 import { FetchMovies, Movie } from "../../types/movie.type";
 import "./popularMovies.scss";
+import Unknown from "../../assets/unknown.jpg";
+import ScrollTop from "../ScrollTop";
+import Loading from "../../assets/loading.svg";
 
 const PopularMovies = () => {
   const [movies, setMovies] = useState<Array<Movie>>([]);
@@ -25,7 +28,7 @@ const PopularMovies = () => {
         setMovies([]);
         setEndPost(true);
         setLoading(false);
-      } else if (newMovies?.results.length === 0) {
+      } else if (newMovies?.results?.length === 0) {
         setEndPost(true);
         setLoading(false);
       } else if (page === 1) {
@@ -60,10 +63,6 @@ const PopularMovies = () => {
     }
   }, [page]);
 
-  // useEffect(() => {
-  //   console.log(movies);
-  // }, [movies]);
-
   useEffect(() => {
     if (!endPost && !loading) {
       const handleScroll = () => {
@@ -85,15 +84,15 @@ const PopularMovies = () => {
 
   return (
     <section className="popular-movies">
-      <p>Popular Movies</p>
-
+      <ScrollTop />
       {totalPages > 0 && totalResults && (
         <div className="popular-movies-infos">
           <p>
-            Page {page} of {totalPages}
+            Page <span></span>
+            {page} sur {totalPages}
           </p>
           <p>
-            total results : {movies.length} of {totalResults}
+            Nombre de résultats : {movies.length} sur {totalResults}
           </p>
         </div>
       )}
@@ -107,7 +106,7 @@ const PopularMovies = () => {
                 id={movie.id?.toString()}
                 className="popular-movie-card"
               >
-                <Link to={"/movie/" + movie.id}>
+                <Link to={"/film/" + movie.id}>
                   <div className="data">
                     <p className="year">{year}</p>
                     <p className="title">{movie.title}</p>
@@ -116,9 +115,8 @@ const PopularMovies = () => {
                     src={
                       movie.poster_path
                         ? "https://image.tmdb.org/t/p/w500/" + movie.poster_path
-                        : "https://via.placeholder.com/500x750"
+                        : Unknown
                     }
-                    width={500}
                     className="popular-movie-img"
                     alt=""
                   />
@@ -130,7 +128,25 @@ const PopularMovies = () => {
           <p>No movies found</p>
         )}
       </ul>
-      {loading && <p>Loading</p>}
+      {loading ? (
+        <img 
+          className="loading"
+          src={Loading} 
+          alt="loading"
+          width={40}
+          height={40}
+        />
+      ) : (
+        <button
+          onClick={() => {
+            const nextPage = page + 1;
+            setPage(nextPage);
+          }}
+          className="load-more secondary"
+        >
+          Charger plus
+        </button>
+      )}
       {error && <p>{error}</p>}
     </section>
   );

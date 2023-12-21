@@ -1,6 +1,7 @@
-# API site
+# THERE IS A MAKEFILE
 
-https://www.omdbapi.com/
+# API site
+API link https://developer.themoviedb.org/docs/authentication-application
 
 # How to run
 

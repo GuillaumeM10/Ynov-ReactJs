@@ -1,41 +1,27 @@
-import { useContext, useState } from "react";
-import { AuthContext } from "../context/AuthContext";
+import { useState } from "react";
 import Signin from "../components/Auth/Signin";
-import { LOGOUT } from "../reducer/AuthReducer";
 import Signup from "../components/Auth/Signup";
+import "./auth.scss";
 
 const Auth = () => {
-  const { state, dispatch } = useContext(AuthContext);
-
   const [tabs, setTabs] = useState<boolean>(false);
+  const [slide, setSlide] = useState<boolean>(false);
 
-  const logout = () => {
-    dispatch({ type: LOGOUT });
-    localStorage.removeItem("user");
+  const changeTabSlide = () => {
+    setTabs(!tabs);
+    setSlide(!slide);
   };
 
   return (
-    <div>
-      {state.isLogged ? (
-        <div>
-          <h1>Logged in as {state.userInfos.email}</h1>
-          <button onClick={logout}>Logout</button>
+    <div className="auth">
+      <div className="slide">
+        <div className="slider">
+          <div className={slide ? "activeSlide active" : "activeSlide"} />
         </div>
-      ) : (
-        <>
-          {tabs ? (
-            <div>
-              <Signup setTabs={setTabs} />
-              <button onClick={() => setTabs(false)}>Signin</button>
-            </div>
-          ) : (
-            <div>
-              <Signin />
-              <button onClick={() => setTabs(true)}>Signup</button>
-            </div>
-          )}
-        </>
-      )}
+        <button onClick={changeTabSlide}>Connexion</button>
+        <button onClick={changeTabSlide}>Inscription</button>
+      </div>
+      {tabs ? <Signup setTabs={setTabs} /> : <Signin />}
     </div>
   );
 };

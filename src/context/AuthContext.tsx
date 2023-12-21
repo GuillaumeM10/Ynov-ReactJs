@@ -1,5 +1,5 @@
-import { createContext, useEffect, useReducer } from "react";
-import { LOGIN, authReducer, initState } from "../reducer/AuthReducer";
+import { createContext, useReducer } from "react";
+import { authReducer, initState } from "../reducer/AuthReducer";
 
 interface AuthProviderProps {
   children: React.ReactNode;
@@ -10,17 +10,15 @@ const defaultValueType = {
   dispatch: () => null,
 };
 
-const AuthContext = createContext<any>(defaultValueType);
+export type AuthContextType = {
+  state: typeof defaultValueType.state;
+  dispatch: React.Dispatch<any>;
+};
+
+const AuthContext = createContext<AuthContextType>(defaultValueType);
 
 const AuthProvider = ({ children }: AuthProviderProps) => {
   const [state, dispatch] = useReducer(authReducer, initState);
-
-  useEffect(() => {
-    const user = localStorage.getItem("user");
-    if (user) {
-      dispatch({ type: LOGIN, payload: JSON.parse(user) });
-    }
-  }, []);
 
   return (
     <AuthContext.Provider value={{ state, dispatch }}>

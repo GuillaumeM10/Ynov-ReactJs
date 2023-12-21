@@ -4,6 +4,9 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { AuthContext } from "../../context/AuthContext";
 import { auth } from "../../services/firebase.service";
 import { LOGIN } from "../../reducer/AuthReducer";
+import { toast } from "react-hot-toast";
+import AuthService from "../../services/auth.service";
+import UserDetailsService from "../../services/userdetails.service";
 
 const Signin = () => {
   const { dispatch } = useContext(AuthContext);
@@ -14,11 +17,13 @@ const Signin = () => {
   const [password, setPassword] = useState("");
 
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  const onSubmit = async () => {
+
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement> | undefined) => {
+    e?.preventDefault();
     setError(null);
-    console.log("email", email);
-    console.log("password", password);
+    setLoading(true);
 
     try {
       const userResponse = await signInWithEmailAndPassword(
@@ -27,52 +32,87 @@ const Signin = () => {
         password
       );
       if (userResponse.user) {
+        const profile = await AuthService.getAuthUser();
+        const userDetails = await UserDetailsService.getUserDetails(userResponse.user.uid)
+        const userDetailsData = userDetails && userDetails.data()
+
         setTimeout(() => {
-          dispatch({ type: LOGIN, payload: userResponse.user });
-          localStorage.setItem("user", JSON.stringify(userResponse.user));
+          dispatch({
+            type: LOGIN,
+            payload: {
+              userInfos: {
+                ...profile,
+                ...userResponse.user,
+              },
+              userDetails: {
+                ...userDetailsData,
+              }
+            },
+          });
+          
+          // setUserDetails(userDetails);
+
+          toast.success("Connexion réussie");
+          setLoading(false);
           navigate(state?.from ? state.from : "/");
         }, 2000);
       }
     } catch (error: any) {
-      const errorCode = error.code;
+      const errorCode: string = error.code;
       if (errorCode === "auth/wrong-password") {
         setError("Le mot de passe est invalide");
+        toast.error("Le mot de passe est invalide");
       } else if (errorCode === "auth/user-not-found") {
         setError("L'email est invalide");
+        toast.error("L'email est invalide");
       } else {
         setError("Une erreur est survenue");
+        toast.error("Une erreur est survenue");
       }
+
+      setLoading(false);
     }
   };
 
   return (
-    <div>
-      <h1>Login Form</h1>
+    <form onSubmit={(e) => onSubmit(e)} className="form">
+      <h1>Connexion</h1>
 
-      <div>
-        <label>Email</label>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-      </div>
+      {loading ? (
+        <p>Connexion en cours...</p>
+      ) : (
+        <>
+          <div className="input">
+            <label>Email :</label>
+            <input
+              type="email"
+              value={email}
+              autoComplete="email"
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
 
-      <div>
-        <label>Password</label>
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-      </div>
+          <div className="input">
+            <label>Password :</label>
+            <input
+              type="password"
+              value={password}
+              autoComplete="current-password"
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
+          {error && <p style={{ color: "red" }}>{error}</p>}
 
-      <button onClick={onSubmit} disabled={email === "" || password === ""}>
-        Login
-      </button>
-    </div>
+          <button
+            onClick={() => onSubmit(undefined)}
+            disabled={email === "" || password === ""}
+          >
+            se connecter
+          </button>
+        </>
+      )}
+    </form>
   );
 };
 

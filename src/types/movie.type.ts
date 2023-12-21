@@ -46,9 +46,61 @@ export interface Movie {
   tagline: string | undefined;
 }
 
+export interface MovieFirebase {
+  likes?: number;
+  movieId?: number;
+  rates?: number[];
+  comments?: {
+    userId: string;
+    text: string;
+  }[];
+};
+
+export interface Movies {
+  page: number;
+  results: Movie[];
+  total_pages: number;
+  total_results: number;
+}
+
 export interface FetchMovies {
   page: number;
   total_pages: number;
   results: Movie[];
   total_results: number;
+}
+
+export interface Cast {
+  id: number;
+  character: string;
+  name: string;
+  original_name: string;
+  profile_path: string;
+  cast_id: number;
+  credit_id: string;
+  order: number;
+  popularity: number;
+  known_for_department: string;
+  gender: number;
+  adult: boolean;
+}
+
+export interface Crew {
+  id: number;
+  department: string;
+  job: string;
+  name: string;
+  original_name: string;
+  profile_path: string;
+  credit_id: string;
+  popularity: number;
+  known_for_department: string;
+  gender: number;
+  adult: boolean;
+}
+
+export interface Credits {
+  id: number;
+  cast: Cast[];
+  crew: Crew[];
 }

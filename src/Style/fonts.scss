@@ -1,0 +1,92 @@
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+h2 {
+  font-size: 2.4em;
+  line-height: 1.1;
+}
+
+h3 {
+  font-size: 1.8em;
+  line-height: 1.1;
+}
+
+h4 {
+  font-size: 1.6em;
+  line-height: 1.1;
+}
+
+h5 {
+  font-size: 1.4em;
+  line-height: 1.1;
+}
+
+h6 {
+  font-size: 1.2em;
+  line-height: 1.1;
+}
+
+p {
+  font-size: 1.6em;
+  line-height: 1.5;
+}
+
+button {
+  font-family: inherit;
+  font-size: 1.6em;
+  line-height: 1.5;
+  font-weight: 400;
+  color: inherit;
+  background-color: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+
+  &:focus {
+    outline: 0;
+  }
+
+  &::-moz-focus-inner {
+    border: 0;
+  }
+
+  &:disabled,
+  &[disabled] {
+    cursor: default;
+  }
+
+  &:disabled:hover {
+    text-decoration: none;
+  }
+
+  &:disabled:focus {
+    outline: 0;
+  }
+
+  &:disabled::-moz-focus-inner {
+    border: 0;
+  }
+
+  &:disabled,
+  &[disabled] {
+    cursor: default;
+  }
+}
+
+a{
+  text-decoration: none;
+  color: inherit;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+li {
+  padding: 0;
+  margin: 0;
+}
