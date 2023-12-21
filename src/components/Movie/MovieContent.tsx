@@ -267,7 +267,6 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
               <h3>Acteurs</h3>
 
               <Swiper
-                // install Swiper modules
                 modules={[Navigation, Pagination, Scrollbar, A11y]}
                 spaceBetween={0}
                 slidesPerView={"auto"}
@@ -302,7 +301,6 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
               <h3>Crew</h3>
 
               <Swiper
-                // install Swiper modules
                 modules={[Navigation, Pagination, Scrollbar, A11y]}
                 spaceBetween={0}
                 slidesPerView={"auto"}

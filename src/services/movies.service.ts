@@ -76,7 +76,6 @@ const getMovieData = async (movie: Movie) => {
 const likeMovie = async (movie: Movie) => {
   const movieExists = await getMovieData(movie);
 
-  //if movie exists, updtade likes
   if (movieExists) {
 
     const movieRef = doc(db, "Movies", movieExists.id);
@@ -117,11 +116,6 @@ const removeLikeMovie = async (movie: Movie) => {
     throw error;
   }
 };
-
-// const getMovieComments = async (movie: Movie){
-  
-// }
-
 
 const MovieService: MovieServiceType = {
   popularMovies,

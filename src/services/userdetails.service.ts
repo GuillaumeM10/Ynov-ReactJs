@@ -21,9 +21,6 @@ export type UserDetailsServiceType = {
   getUserDetails: (
     userId: string
   ) => Promise<QueryDocumentSnapshot<DocumentData, DocumentData> | void>;
-  // getUserDetailsAllLikes: (
-  //   userId: string
-  // ) => Promise<DocumentData>;
   updateUserDetails: (
     userId: string
   ) => Promise<DocumentData | void>;
@@ -41,7 +38,7 @@ const createUserdetailsColection = async (userId: string) => {
 
     return resp;
   } catch (error) {
-    // console.log(error);
+    console.log(error);
     throw error;
   }
 };
@@ -139,7 +136,6 @@ const toggleIsAdmin = async (userId: string, isAdmin: boolean) => {
 const UserDetailsService: UserDetailsServiceType = {
   createUserdetailsColection,
   getUserDetails,
-  // getUserDetailsAllLikes,
   updateUserDetails,
   toggleLikeMovie,
   toggleIsAdmin,

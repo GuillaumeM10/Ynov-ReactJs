@@ -14,10 +14,6 @@ const PopularMovies = () => {
     getMovies();
   }, []);
 
-  useEffect(() => {
-    console.log(movies);
-  }, [movies]);
-
   const getMovies = async (): Promise<void> => {
     try {
       const res = await MovieService.popularMovies(page);
@@ -34,10 +30,6 @@ const PopularMovies = () => {
     setLoading(true);
     getMovies();
   }, [page]);
-
-  useEffect(() => {
-    console.log(movies);
-  }, [movies]);
 
   useEffect(() => {
     const handleScroll = () => {

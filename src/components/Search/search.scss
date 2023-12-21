@@ -68,7 +68,6 @@ $crossDark: "data:image/svg+xml,%3Csvg id='cross-blue' xmlns='http://www.w3.org/
   }
 
   .results{
-    // display: none;
     position: absolute;
     top: calc(100% + 20px);
     left: 0;
@@ -143,7 +142,6 @@ $crossDark: "data:image/svg+xml,%3Csvg id='cross-blue' xmlns='http://www.w3.org/
       }
     }
 
-    // scrollbar
     &::-webkit-scrollbar {
       background-color: #3f3e3e;
       backdrop-filter: saturate(100%) blur(40px);
