@@ -30,8 +30,8 @@ const Signup = ({ setTabs }: signupPropsType) => {
 
       if (newUser.user) {
         toast.success("Inscription réussie");
-        setLoading(false);
         setTabs(false);
+        setLoading(false);
       }
     } catch (error: any) {
       const errorCode: string = error.code;
