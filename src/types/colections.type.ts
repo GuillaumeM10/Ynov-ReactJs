@@ -7,17 +7,22 @@ export interface UserDetailsType {
     rate: number;
   }[];
   comments?: {
+    id: string;
     movieId: number;
     text: string;
   }[];
 }
 
-export interface MobiesColection {
+export interface MovieComment{
+  id: string;
+  userId: string;
+  displayName?: string;
+  photoURL?: string;
+  text: string;
+}
+export interface MoviesColection {
   movieId: string;
   likes: number;
   rates: number[];
-  comments: {
-    userId: string;
-    text: string;
-  }[];
+  comments: MovieComment[];
 }

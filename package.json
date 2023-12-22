@@ -19,12 +19,14 @@
     "react-select": "^5.8.0",
     "sass": "^1.69.5",
     "swiper": "^11.0.5",
-    "timers": "^0.1.1"
+    "timers": "^0.1.1",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@types/node": "^20.10.1",
     "@types/react": "^18.2.37",
     "@types/react-dom": "^18.2.15",
+    "@types/uuid": "^9.0.7",
     "@typescript-eslint/eslint-plugin": "^6.10.0",
     "@typescript-eslint/parser": "^6.10.0",
     "@vitejs/plugin-react": "^4.2.0",

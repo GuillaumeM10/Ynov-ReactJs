@@ -3,12 +3,40 @@ import './likedMovies.scss';
 import { AuthContext } from '../context/AuthContext';
 import { Movie } from '../types/movie.type';
 import MovieService from '../services/movies.service';
-import Unknown from "../assets/unknown.jpg";
-import { Link } from 'react-router-dom';
+import MovieCard from '../components/Movie/MovieCard';
+import UserDetailsService from '../services/userdetails.service';
 
 const LikedMovies = () => {
-  const { state } = useContext(AuthContext);
+  const { dispatch, state } = useContext(AuthContext);
   const [movies, setMovies] = useState<Movie[]>([]);
+
+  const updateUserDetails = async () => {
+    try {
+      if(!state.userInfos?.uid) return;
+      const userDetails = await UserDetailsService.getUserDetails(state.userInfos?.uid);
+      
+      if(!userDetails) return;
+      const userDetailsData = userDetails.data();
+
+      dispatch({
+        type: "UPDATE_USER_INFOS",
+        payload: {
+          userInfos: {
+            ...state.userInfos,
+          },
+          userDetails: {
+            ...userDetailsData
+          }
+        }
+      });
+
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  useEffect(() => {
+    updateUserDetails();
+  }, [])
 
   const getMovies = async () => {
     if (state.userDetails?.likes) {
@@ -35,29 +63,8 @@ const LikedMovies = () => {
       <ul className="movies">
         {movies && movies.length > 0 ? (
           movies.map((movie: Movie) => {
-            const year = movie.release_date?.split("-")[0];
             return (
-              <li
-                key={movie.id}
-                id={movie.id?.toString()}
-                className="movie-card"
-              >
-                <Link to={"/film/" + movie.id}>
-                  <div className="data">
-                    <p className="year">{year}</p>
-                    <p className="title">{movie.title}</p>
-                  </div>
-                  <img
-                    src={
-                      movie.poster_path
-                        ? "https://image.tmdb.org/t/p/w500/" + movie.poster_path
-                        : Unknown
-                    }
-                    className="movie-img"
-                    alt=""
-                  />
-                </Link>
-              </li>
+              <MovieCard movie={movie} key={movie.id} />
             );
           })
         ) : (

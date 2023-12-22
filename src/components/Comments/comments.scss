@@ -1,0 +1,68 @@
+.comments-list{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  --customvar: 0;
+
+  li:last-of-type .comment{
+    border-bottom: none;
+  }
+
+  .movie{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+    margin-top: 5rem;
+
+    @media screen and (max-width: 768px){
+      flex-direction: column;
+      gap: 1rem;
+    }
+  }
+
+  .comment{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 3rem;
+    padding: 2rem 0;
+    border-bottom: 1px solid #ccc;
+    position: relative;
+
+    .author{
+      border-right: 1px solid #ccc;
+      padding: 0 1rem;
+      width: 20%;
+
+      .comment-author{
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+    }
+
+    .delete-comment{
+      position: absolute;
+      top: 2rem;
+      right: 0;
+
+      &:not(.loading){
+        background: red;
+        color: white;
+        border-radius: 5px;
+        height: 3.4rem;
+        width: 3.4rem;
+        line-height: 1rem;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+      }
+
+      &:hover:not(.loading){
+        background: darken($color: red, $amount: 5%);
+      }
+
+    }
+  }
+}

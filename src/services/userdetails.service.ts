@@ -15,17 +15,23 @@ import { Movie } from "../types/movie.type";
 import { UserDetailsType } from "../types/colections.type";
 
 export type UserDetailsServiceType = {
+
   createUserdetailsColection: (
     userId: string
   ) => Promise<DocumentReference<DocumentData, DocumentData> | undefined>;
+  
   getUserDetails: (
     userId: string
   ) => Promise<QueryDocumentSnapshot<DocumentData, DocumentData> | void>;
-  updateUserDetails: (
-    userId: string
-  ) => Promise<DocumentData | void>;
+
   toggleLikeMovie: (userId: string, movie: Movie) => Promise<UserDetailsType | void>;
+
   toggleIsAdmin: (userId: string, isAdmin: boolean) => Promise<DocumentData | void>;
+
+  addComment: (userId: string, movie: Movie, text: string, id: string) => Promise<DocumentData | void>;
+
+  removeComment: (userId: string, id: string) => Promise<DocumentData | void>;
+
 };
 
 const createUserdetailsColection = async (userId: string) => {
@@ -55,25 +61,6 @@ const getUserDetails = async (userId: string) => {
   } catch (error) {
     console.log(error);
     throw error;
-  }
-};
-
-
-const updateUserDetails = async (userId: string) => {
-  try{
-    const userDetails = await getUserDetails(userId);
-    if (!userDetails) return;
-
-    const userDetailsId = userDetails.id;
-    const userDetailsData = userDetails.data();
-
-    await updateDoc(doc(db, "userDetails", userDetailsId), {
-      ...userDetailsData
-    });
-
-    return userDetails.data();
-  }catch (error) {
-    console.log(error);
   }
 };
 
@@ -133,12 +120,77 @@ const toggleIsAdmin = async (userId: string, isAdmin: boolean) => {
   }
 }
 
+const addComment = async (
+  userId: string, 
+  movie: Movie, 
+  text: string, 
+  id: string
+) => {
+
+  try{
+    const userDetails = await getUserDetails(userId);
+    if (!userDetails) return;
+
+    const userDetailsId = userDetails.id;
+    const userDetailsData = userDetails.data();
+
+    if(userDetailsData.comments){
+      await updateDoc(doc(db, "userDetails", userDetailsId), {
+        ...userDetailsData,
+        comments: [
+          ...userDetailsData.comments,
+          {
+            movieId: movie.id,
+            text,
+            id
+          }
+        ]
+      });
+    }else{
+      await updateDoc(doc(db, "userDetails", userDetailsId), {
+        ...userDetailsData,
+        comments: [
+          {
+            movieId: movie.id,
+            text,
+            id
+          }
+        ]
+      });
+    }
+    return userDetails.data();
+  }catch (error) {
+    console.log(error);
+  }
+}
+
+const removeComment = async (userId: string, id: string) => {
+  try{
+    const userDetails = await getUserDetails(userId);
+    if (!userDetails) return;
+
+    const userDetailsId = userDetails.id;
+    const userDetailsData = userDetails.data();
+
+    await updateDoc(doc(db, "userDetails", userDetailsId), {
+      ...userDetailsData,
+      comments: userDetailsData.comments.filter((comment: any) => comment.id !== id)
+    });
+
+    return userDetails.data();
+  }catch (error) {
+    console.log(error);
+  }
+}
+
+
 const UserDetailsService: UserDetailsServiceType = {
   createUserdetailsColection,
   getUserDetails,
-  updateUserDetails,
   toggleLikeMovie,
   toggleIsAdmin,
+  addComment,
+  removeComment
 };
 
 export default UserDetailsService;

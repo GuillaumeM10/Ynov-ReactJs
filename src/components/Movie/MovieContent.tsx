@@ -9,6 +9,9 @@ import Loading from "../../assets/loading.svg";
 import { AuthContext } from "../../context/AuthContext";
 import UserDetailsService from "../../services/userdetails.service";
 import { UPDATE_USER_INFOS } from "../../reducer/AuthReducer";
+import MovieComments from "../Comments/MovieComments";
+import CreateComment from "../Comments/CreateComment";
+import { MoviesColection } from "../../types/colections.type";
 
 export type MovieContentPropsType = {
   id: number;
@@ -16,6 +19,7 @@ export type MovieContentPropsType = {
 
 const MovieContent = ({ id }: MovieContentPropsType) => {
   const [movie, setMovie] = useState<Movie>();
+  const [movieCollection, setMovieCollection] = useState<MoviesColection | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [credits, setCredits] = useState<Credits>();
@@ -75,12 +79,29 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
     }
   };
 
+  const getMovieCollection = async () : Promise<void> => {
+    try {
+      const res = await MoviesService.getMovieData(id);
+
+      if(!res) return;
+      const resDate = res.data()
+
+      setMovieCollection(resDate as MoviesColection);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   useEffect(() => {
     setIsLike(false);
     setLoading(true);
     getMovie();
     getCredit();
   }, [id]);
+
+  useEffect(() => {
+    getMovieCollection();
+  }, [id, isLike]);
 
   useEffect(() => {
     if (movie) {
@@ -92,25 +113,30 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
     setLoadingLike(true);
     try {
       if(!state.userDetails?.userId) return;
-      await MoviesService.likeMovie(movie as Movie);
       await UserDetailsService.toggleLikeMovie(
         state.userDetails?.userId,
         movie as Movie
       );
-      const updateUserDetails = await UserDetailsService.updateUserDetails(state.userDetails?.userId)
+
+
+      const updateUserDetails = await UserDetailsService.getUserDetails(state.userDetails?.userId)
+      const updateUserDetailsData = updateUserDetails?.data()
       
       dispatch({
         type: UPDATE_USER_INFOS,
         payload: {
           userInfos: state.userInfos,
           userDetails : {
-            ...updateUserDetails
+            ...updateUserDetailsData
           }
         },
       })
-      if(updateUserDetails?.likes){
-        setIsLike(updateUserDetails?.likes?.includes(movie?.id as number) ? true : false);
+      
+      if(updateUserDetailsData?.likes?.includes(movie?.id as number)){
+        await MoviesService.likeMovie(movie as Movie);
+        setIsLike(true);
       }else{
+        await MoviesService.removeLikeMovie(movie as Movie);
         setIsLike(false);
       }
       setLoadingLike(false);
@@ -257,7 +283,7 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
                   </p>
 
                   <p className="vote_count">
-                    Nombre de votants : {movie.vote_count}
+                    Nombre de j'aime : {movieCollection?.likes ?? "0"}
                   </p>
                 </div>
               </div>
@@ -330,6 +356,12 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
                   ))}
               </Swiper>
             </div>
+
+            {state.isLogged && state.userInfos &&(
+              <CreateComment movie={movie} userInfos={state.userInfos} />
+            )}
+
+            <MovieComments movie={movie} />
           </div>
         )
       )}

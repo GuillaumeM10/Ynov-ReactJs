@@ -46,16 +46,6 @@ export interface Movie {
   tagline: string | undefined;
 }
 
-export interface MovieFirebase {
-  likes?: number;
-  movieId?: number;
-  rates?: number[];
-  comments?: {
-    userId: string;
-    text: string;
-  }[];
-};
-
 export interface Movies {
   page: number;
   results: Movie[];

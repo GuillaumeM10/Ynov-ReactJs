@@ -9,17 +9,20 @@ export const initState = {
   isLoading: false,
   userInfos: user?.uid ? user : null,
   userDetails: userDetailsStorage ? userDetailsStorage : null,
+  update: false,
 };
 
 export const LOGIN = "LOGIN";
 export const LOGOUT = "LOGOUT";
 export const UPDATE_USER_INFOS = "UPDATE_USER_INFOS";
+export const UPADTE = "UPDATE";
 
 export type AuthStateType = {
   isLogged: boolean;
   isLoading: boolean;
   userInfos: User | null;
   userDetails: UserDetailsType | null;
+  update: boolean;
 };
 
 export type AuthActionType = {
@@ -59,6 +62,12 @@ export const authReducer = (state: AuthStateType, action: AuthActionType) => {
         userInfos: initState.userInfos,
         userDetails: initState.userDetails,
       };
+    case UPADTE: {
+      return {
+        ...state,
+        update: !state.update,
+      };
+    }
     default:
       return initState;
   }
