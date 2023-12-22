@@ -283,7 +283,7 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
                   </p>
 
                   <p className="vote_count">
-                    Nombre de likes : {movieCollection?.likes ?? "0"}
+                    Nombre de j'aime : {movieCollection?.likes ?? "0"}
                   </p>
                 </div>
               </div>
