@@ -16,7 +16,7 @@ const MovieComments = ({movie}:MovieCommentsType) => {
 
   const getMovieCollection = async () : Promise<void> => {
     try {
-      const res = await MovieService.getMovieData(movie);
+      const res = await MovieService.getMovieData(movie.id);
 
       if(!res) return;
       const resDate = res.data()
@@ -54,7 +54,7 @@ const MovieComments = ({movie}:MovieCommentsType) => {
           movieCollection.comments.map((comment) => {
 
             return (
-              <Comment key={comment.id} comment={comment} userId={state.userInfos?.uid} movie={movie} />
+              <Comment key={comment.id} comment={comment} userId={state.userInfos?.uid} movieId={movie.id} />
             );
 
           })

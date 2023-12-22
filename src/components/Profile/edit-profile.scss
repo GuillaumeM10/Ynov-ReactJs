@@ -1,0 +1,83 @@
+.edit-profile{
+  form{
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+    max-width: 40rem;
+    width: 100%;
+    margin-bottom: 2rem;
+  }
+
+  .field{
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    position: relative;
+
+    input{
+      color: white;
+      background: transparent;
+      border: 0;
+      border-bottom: 1px solid rgb(199, 199, 199);
+      padding: 0.5rem 0;
+      font-size: 1.2em;
+      font-weight: 600;
+      width: 100%;
+      transition: all 0.2s ease-in;
+
+      &:focus{
+        outline: 0;
+        border-bottom: 1px solid white;
+      }
+
+      &:focus + label,
+      &:valid + label{
+        top: -1rem;
+        font-size: 0.8em;
+        color: green;
+      }
+
+      &:focus + label{
+        color: white;
+      }
+    }
+
+    &-checkbox{
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 1rem;
+      font-size: 1.2em;
+      font-weight: 600;
+      color: white;
+
+      input{
+        width: 2rem;
+        height: 2rem;
+        margin: 0;
+      }
+    }
+  }
+
+  button:not(.burger){
+    width: fit-content;
+  }
+
+  .send-verification-mail{
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    justify-content: center;
+    border: solid 1px rgb(199, 199, 199);
+    border-radius: .5rem;
+    padding: 0.5rem 1rem;
+
+    button{
+      height: fit-content;
+    }
+  }
+
+  button[type="submit"]{
+    font-size: 1.5em;
+  }
+}

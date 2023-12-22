@@ -26,16 +26,18 @@ export type MovieServiceType = {
 
   getCredits: (id: number) => Promise<Credits>;
 
-  getMovieData: (movie: Movie) => Promise<QueryDocumentSnapshot<DocumentData, DocumentData> | false> ;
+  getMovieData: (movieId: Movie["id"]) => Promise<QueryDocumentSnapshot<DocumentData, DocumentData> | false> ;
 
   likeMovie: (movie: Movie) => Promise<DocumentReference<DocumentData, DocumentData> | void >;
 
   removeLikeMovie: (movie: Movie) => Promise<void>;
 
-  addComment: (movie: Movie, userId: string, displayName: string | null, photoURL: string | null, text: string, id: string) => Promise<DocumentReference<DocumentData, DocumentData> | void>;
+  addComment: (movieId: Movie["id"], userId: string, displayName: string | null, photoURL: string | null, text: string, id: string) => Promise<DocumentReference<DocumentData, DocumentData> | void>;
   
-  removeComment: (movie: Movie, id: string) => Promise<DocumentReference<DocumentData, DocumentData> | void>;
+  removeComment: (movieId: Movie["id"], id: string) => Promise<DocumentReference<DocumentData, DocumentData> | void>;
   
+  getMoviesWithComments: () => Promise<QueryDocumentSnapshot<DocumentData, DocumentData>[]>;
+
 };
 
 const popularMovies = async (page?: number) => {
@@ -75,8 +77,8 @@ const getCredits = async (id: number) => {
   }
 };
 
-const getMovieData = async (movie: Movie) => {
-  const q = query(collection(db, "Movies"), where("movieId", "==", movie.id));
+const getMovieData = async (movieId: Movie["id"]) => {
+  const q = query(collection(db, "Movies"), where("movieId", "==", movieId));
   const querySnapshot = await getDocs(q);
   
   if (querySnapshot.empty) {
@@ -87,7 +89,7 @@ const getMovieData = async (movie: Movie) => {
 };
 
 const likeMovie = async (movie: Movie) => {
-  const movieExists = await getMovieData(movie);
+  const movieExists = await getMovieData(movie.id);
 
   try {
     
@@ -95,7 +97,7 @@ const likeMovie = async (movie: Movie) => {
 
       const movieRef = doc(db, "Movies", movieExists.id);
       await updateDoc(movieRef, {
-        likes: movieExists.data().likes + 1,
+        likes: movieExists.data().likes ? movieExists.data().likes + 1 : 1,
       });
       return movieRef;
 
@@ -116,13 +118,15 @@ const likeMovie = async (movie: Movie) => {
 const removeLikeMovie = async (movie: Movie) => {
   
   try{
-    const movieExists = await getMovieData(movie);
-
+    const movieExists = await getMovieData(movie.id);
+    
     if (movieExists) {
+      console.log(movieExists.data().likes);
       const movieRef = doc(db, "Movies", movieExists.id);
-      if (movieExists.data().likes - 1 < 1) {
-        await deleteDoc(movieRef);
-
+      if (movieExists.data().likes - 1 < 1 || !movieExists.data().likes) {
+        await updateDoc(movieRef, {
+          likes: 0,
+        });
       } else {
         await updateDoc(movieRef, {
           likes: movieExists.data().likes - 1,
@@ -135,20 +139,8 @@ const removeLikeMovie = async (movie: Movie) => {
   }
 };
 
-// export interface MoviesColection {
-//   movieId: string;
-//   likes: number;
-//   rates: number[];
-  // comments: {
-  //   id: string;
-  //   displayName?: string;
-  //   photoURL?: string;
-  //   text: string;
-  // }[];
-// }
-
 const addComment = async (
-  movie: Movie, 
+  movieId: Movie["id"],
   userId: string, 
   displayName: string | null, 
   photoURL: string | null, 
@@ -156,7 +148,7 @@ const addComment = async (
   id: string
 ) => {
   try {
-    const movieExists = await getMovieData(movie);
+    const movieExists = await getMovieData(movieId);
     if (movieExists) {
       const movieRef = doc(db, "Movies", movieExists.id);
       if(movieExists.data().comments){
@@ -183,7 +175,7 @@ const addComment = async (
       return movieRef;
     }else{
       const docRef = await addDoc(collection(db, "Movies"), {
-        movieId: movie.id,
+        movieId: movieId,
         comments: [
           {
             displayName,
@@ -200,9 +192,9 @@ const addComment = async (
   }
 }
 
-const removeComment = async (movie: Movie, id: string) => {
+const removeComment = async (movieId: Movie["id"], id: string) => {
   try {
-    const movieExists = await getMovieData(movie);
+    const movieExists = await getMovieData(movieId);
 
     if (movieExists) {
       const movieRef = doc(db, "Movies", movieExists.id);
@@ -217,6 +209,11 @@ const removeComment = async (movie: Movie, id: string) => {
   }
 }
 
+const getMoviesWithComments = async () => {
+  const q = query(collection(db, "Movies"), where("comments", "!=", []));
+  const querySnapshot = await getDocs(q);  
+  return querySnapshot.docs;
+}
 
 const MovieService: MovieServiceType = {
   popularMovies,
@@ -228,6 +225,7 @@ const MovieService: MovieServiceType = {
   removeLikeMovie,
   addComment,
   removeComment,
+  getMoviesWithComments,
 };
 
 export default MovieService;

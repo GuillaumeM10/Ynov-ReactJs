@@ -4,10 +4,39 @@ import { AuthContext } from '../context/AuthContext';
 import { Movie } from '../types/movie.type';
 import MovieService from '../services/movies.service';
 import MovieCard from '../components/Movie/MovieCard';
+import UserDetailsService from '../services/userdetails.service';
 
 const LikedMovies = () => {
-  const { state } = useContext(AuthContext);
+  const { dispatch, state } = useContext(AuthContext);
   const [movies, setMovies] = useState<Movie[]>([]);
+
+  const updateUserDetails = async () => {
+    try {
+      if(!state.userInfos?.uid) return;
+      const userDetails = await UserDetailsService.getUserDetails(state.userInfos?.uid);
+      
+      if(!userDetails) return;
+      const userDetailsData = userDetails.data();
+
+      dispatch({
+        type: "UPDATE_USER_INFOS",
+        payload: {
+          userInfos: {
+            ...state.userInfos,
+          },
+          userDetails: {
+            ...userDetailsData
+          }
+        }
+      });
+
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  useEffect(() => {
+    updateUserDetails();
+  }, [])
 
   const getMovies = async () => {
     if (state.userDetails?.likes) {

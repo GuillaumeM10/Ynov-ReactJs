@@ -24,10 +24,6 @@ export type UserDetailsServiceType = {
     userId: string
   ) => Promise<QueryDocumentSnapshot<DocumentData, DocumentData> | void>;
 
-  updateUserDetails: (
-    userId: string
-  ) => Promise<DocumentData | void>;
-
   toggleLikeMovie: (userId: string, movie: Movie) => Promise<UserDetailsType | void>;
 
   toggleIsAdmin: (userId: string, isAdmin: boolean) => Promise<DocumentData | void>;
@@ -65,25 +61,6 @@ const getUserDetails = async (userId: string) => {
   } catch (error) {
     console.log(error);
     throw error;
-  }
-};
-
-
-const updateUserDetails = async (userId: string) => {
-  try{
-    const userDetails = await getUserDetails(userId);
-    if (!userDetails) return;
-
-    const userDetailsId = userDetails.id;
-    const userDetailsData = userDetails.data();
-
-    await updateDoc(doc(db, "userDetails", userDetailsId), {
-      ...userDetailsData
-    });
-
-    return userDetails.data();
-  }catch (error) {
-    console.log(error);
   }
 };
 
@@ -142,21 +119,6 @@ const toggleIsAdmin = async (userId: string, isAdmin: boolean) => {
     console.log(error);
   }
 }
-
-// export interface UserDetailsType {
-//   admin: boolean;
-//   userId: string;
-//   likes?: number[];
-//   rates?: {
-//     movieId: number;
-//     rate: number;
-//   }[];
-//   comments?: {
-//     id: string;
-//     movieId: number;
-//     text: string;
-//   }[];
-// }
 
 const addComment = async (
   userId: string, 
@@ -225,7 +187,6 @@ const removeComment = async (userId: string, id: string) => {
 const UserDetailsService: UserDetailsServiceType = {
   createUserdetailsColection,
   getUserDetails,
-  updateUserDetails,
   toggleLikeMovie,
   toggleIsAdmin,
   addComment,

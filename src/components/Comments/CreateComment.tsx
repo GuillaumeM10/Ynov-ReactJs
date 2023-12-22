@@ -32,7 +32,7 @@ const CreateComment = ({movie, userInfos}:CreateCommentType) => {
 
     try {
       await MovieService.addComment(
-        movie, 
+        movie.id, 
         comment.userId,
         comment.displayName,
         comment.photoURL,
