@@ -28,8 +28,6 @@ const Comment = ({comment, userId, movieId, fromUserProfile, isFirst}: CommentTy
       await MovieService.removeComment(movieId, comment.id);
 
       if(comment.userId !== state.userInfos?.uid && state.userDetails?.admin){
-        console.log(comment);
-        
         await UserDetailsService.removeComment(comment.userId, comment.id);
 
         dispatch({

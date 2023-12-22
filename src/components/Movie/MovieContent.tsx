@@ -109,10 +109,6 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
     }
   }, [movie]);
 
-  useEffect(() => {
-    console.log(movieCollection);
-  }, [movieCollection])
-
   const toggleLikeMovie = async () => {
     setLoadingLike(true);
     try {
