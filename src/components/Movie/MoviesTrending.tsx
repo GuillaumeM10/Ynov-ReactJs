@@ -51,7 +51,7 @@ const MoviesTrending = () => {
 
         </div>
             
-      ) : <img src={Loading} alt="loading" />}
+      ) : <img width={50} height={50} src={Loading} alt="loading" />}
     </Fragment>
   );
 };
