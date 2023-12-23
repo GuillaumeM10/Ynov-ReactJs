@@ -86,12 +86,11 @@ const PopularMovies = () => {
       <ScrollTop />
       {totalPages > 0 && totalResults && (
         <div className="popular-movies-infos">
-          <p>
-            Page <span></span>
-            {page} sur {totalPages}
+          <p className="page-count">
+            Page <span>{page} sur {totalPages}</span>
           </p>
-          <p>
-            Nombre de résultats : {movies.length} sur {totalResults}
+          <p className="results-count">
+            Résultats <span>{movies.length} sur {totalResults}</span>
           </p>
         </div>
       )}

@@ -1,5 +1,5 @@
 import { MovieComment, MovieRate } from "../types/colections.type";
-import { Credits, Movie, Movies } from "../types/movie.type";
+import { Credits, Movie, Movies, Videos } from "../types/movie.type";
 import api from "./api.service";
 import { db } from "./firebase.service";
 import {
@@ -45,6 +45,11 @@ export type MovieServiceType = {
 
   createMovie: (movieId: Movie["id"]) => Promise<void>;
 
+  getMovieVideos: (movieId: Movie["id"]) => Promise<Videos>;
+  
+  getMoviesSimilar: (movieId: Movie["id"]) => Promise<Movies>;
+
+  getMoviesTopRated: () => Promise<Movies>;
 };
 
 const popularMovies = async (page?: number) => {
@@ -326,6 +331,30 @@ const getMoviesWithRates = async () => {
   return querySnapshot.docs;
 }
 
+const getMovieVideos = async (movieId: Movie["id"]) => {
+  try {
+    return (await api.get(`/movie/${movieId}/videos`)).data;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+const getMoviesSimilar = async (movieId: Movie["id"]) => {
+  try {
+    return (await api.get(`/movie/${movieId}/similar`)).data;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+const getMoviesTopRated = async () => {
+  try {
+    return (await api.get(`/movie/top_rated`)).data;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 const MovieService: MovieServiceType = {
   popularMovies,
   getMovieById,
@@ -340,7 +369,10 @@ const MovieService: MovieServiceType = {
   addRate,
   removeRate,
   getMoviesWithRates,
-  createMovie
+  createMovie,
+  getMovieVideos,
+  getMoviesSimilar,
+  getMoviesTopRated,
 };
 
 export default MovieService;

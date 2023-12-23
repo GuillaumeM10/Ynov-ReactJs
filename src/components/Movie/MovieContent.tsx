@@ -1,6 +1,6 @@
 import { Fragment, useContext, useEffect, useState } from "react";
 import MoviesService from "../../services/movies.service";
-import { Cast, Credits, Crew, Movie } from "../../types/movie.type";
+import { Cast, Credits, Crew, Movie, Movies, Videos } from "../../types/movie.type";
 import "./movie-content.scss";
 import { Navigation, Pagination, Scrollbar, A11y } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -13,6 +13,8 @@ import MovieComments from "../Comments/MovieComments";
 import CreateComment from "../Comments/CreateComment";
 import { MoviesColection } from "../../types/colections.type";
 import CreateRate from "../Rates/CreateRate";
+import MovieCard from "./MovieCard";
+import { toast } from "react-hot-toast";
 
 export type MovieContentPropsType = {
   id: number;
@@ -24,6 +26,8 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [credits, setCredits] = useState<Credits>();
+  const [videos, setVideos] = useState<Videos | null>(null);
+  const [similars, setSimilars] = useState<Movies | null>(null);
   const { state } = useContext(AuthContext);
   const { dispatch } = useContext(AuthContext);
   const [isLike, setIsLike] = useState(false);
@@ -101,11 +105,37 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
     }
   }
 
+  const getMovieVideos = async (): Promise<void> => {
+    try {
+      const res = await MoviesService.getMovieVideos(id);
+      setLoading(false);
+      setError(null);
+      setVideos(res);
+    } catch (err: unknown) {
+      setLoading(false);
+      setError(err as string);
+    }
+  }
+
+  const getMovieSimilar = async (): Promise<void> => {
+    try {
+      const res = await MoviesService.getMoviesSimilar(id);
+      setLoading(false);
+      setError(null);
+      setSimilars(res);
+    } catch (err: unknown) {
+      setLoading(false);
+      setError(err as string);
+    }
+  }
+
   useEffect(() => {
     setIsLike(false);
     setLoading(true);
     getMovie();
     getCredit();
+    getMovieVideos();
+    getMovieSimilar();
   }, [id]);
 
   useEffect(() => {
@@ -165,6 +195,10 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
     }
   }
 
+  useEffect(() => {
+    console.log(videos);
+  }, [videos]);
+
   return (
     <Fragment>
       {loading ? (
@@ -216,7 +250,18 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
               </div>
 
               <div className="movie-content__info">
-                <h2>{movie.title}</h2>
+                <div className="title-container">
+                  <h2>{movie.title}</h2>
+                  <button
+                    className="share secondary"
+                    onClick={() => {
+                      navigator.clipboard.writeText(
+                        window.location.href
+                      );
+                      toast.success("Lien copié dans le presse-papier");
+                    }}
+                  >Partager</button>
+                </div>
                 <p>{movie.overview}</p>
                 <div className="movie-content__info__details">
                   <p className="genres">
@@ -323,12 +368,42 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
 
             </div>
 
+            {videos && videos.results.length > 0 && (
+              <div className="videos">
+                <h3>Vidéos</h3>
+
+                <Swiper
+                  modules={[Navigation, Pagination, Scrollbar, A11y]}
+                  spaceBetween={20}
+                  slidesPerView={"auto"}
+                  navigation
+                  pagination={{ clickable: true }}
+                  scrollbar={{ draggable: true }}
+                  className="videos"
+                >
+                  {videos &&
+                    videos?.results.map((video) => (
+                      <SwiperSlide key={video.id} style={{ width: "fit-content" }}>
+                        <iframe
+                          width="560"
+                          height="315"
+                          src={`https://www.youtube.com/embed/${video.key}`}
+                          title={video.name}
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        ></iframe>
+                      </SwiperSlide>
+                    ))}
+                </Swiper>
+              </div>
+            )}
+
             <div className="cast">
               <h3>Acteurs</h3>
 
               <Swiper
                 modules={[Navigation, Pagination, Scrollbar, A11y]}
-                spaceBetween={0}
+                spaceBetween={10}
                 slidesPerView={"auto"}
                 autoplay={{ delay: 2500, disableOnInteraction: false }}
                 navigation
@@ -362,7 +437,7 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
 
               <Swiper
                 modules={[Navigation, Pagination, Scrollbar, A11y]}
-                spaceBetween={0}
+                spaceBetween={10}
                 slidesPerView={"auto"}
                 autoplay={{ delay: 2500, disableOnInteraction: false }}
                 navigation
@@ -390,6 +465,29 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
                   ))}
               </Swiper>
             </div>
+
+            {similars && similars.results.length > 0 && (
+              <div className="similars">
+                <h3>Films qui vous plairont</h3>
+
+                <Swiper
+                  modules={[Navigation, Pagination, Scrollbar, A11y]}
+                  spaceBetween={20}
+                  slidesPerView={"auto"}
+                  autoplay={{ delay: 2500 }}
+                  navigation
+                  pagination={{ clickable: true }}
+                  className="similars"
+                >
+                  {similars &&
+                    similars?.results.map((similar) => (
+                      <SwiperSlide key={similar.id}>
+                        <MovieCard movie={similar} />
+                      </SwiperSlide>
+                    ))}
+                </Swiper>
+              </div>
+            )}
 
             {state.isLogged && state.userInfos &&(
               <CreateComment movie={movie} userInfos={state.userInfos} />
