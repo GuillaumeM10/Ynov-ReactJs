@@ -1,47 +1,51 @@
 import Unknown from "../../assets/unknown.jpg";
 import MovieService from "../../services/movies.service";
 import UserDetailsService from "../../services/userdetails.service";
-import { MoviesColection, UserDetailsComments } from "../../types/colections.type";
+import { MoviesColection, UserDetailsRates } from "../../types/colections.type";
 import { Movie } from "../../types/movie.type";
 import Loading from "../../assets/loading.svg"
 import { Fragment, useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import { Link } from "react-router-dom";
+import StartFull from "../../assets/star-full.svg"
+import StartEmpty from "../../assets/star-empty.svg"
 
-export type CommentType = {
-  comment: MoviesColection["comments"][0]
+export type RateType = {
+  rate: MoviesColection["rates"][0]
   userId: string | undefined
   movieId: Movie["id"]
   fromUserProfile?: boolean
   isFirst?: boolean
 }
-const Comment = ({comment, userId, movieId, fromUserProfile, isFirst}: CommentType) => {
+const Rate = ({rate, userId, movieId, fromUserProfile, isFirst}: RateType) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [movieLoading, setMovieLoading] = useState<boolean>(false);
   const [movie, setMovie] = useState<Movie | null>(null);
   const { dispatch, state } = useContext(AuthContext);
 
-  const removeComment = async () => {
+  const removeRate = async () => {
     setLoading(true);
     try {
       if(!userId) return;
-      await MovieService.removeComment(movieId, comment.id);
+      await MovieService.removeRate(movieId, rate.id);
 
-      if(comment.userId !== state.userInfos?.uid && state.userDetails?.admin){
-        await UserDetailsService.removeComment(comment.userId, comment.id);
+      if(rate.userId !== state.userInfos?.uid && state.userDetails?.admin){
+        await UserDetailsService.removeRate(rate.userId, rate.id);
 
         dispatch({
           type: "UPDATE",
-          payload: {update: true}
+          payload: {
+            update: true,
+          }
         });
 
         setLoading(false);
         return;
       }else{
-        await UserDetailsService.removeComment(userId, comment.id);
+        await UserDetailsService.removeRate(userId, rate.id);
       }
 
-      if(!state.userDetails?.comments) return;
+      if(!state.userDetails?.rates) return;
 
       dispatch({
         type: "UPDATE_USER_INFOS",
@@ -51,8 +55,8 @@ const Comment = ({comment, userId, movieId, fromUserProfile, isFirst}: CommentTy
           },
           userDetails: {
             ...state.userDetails,
-            comments: [
-              ...state.userDetails?.comments?.filter((thisComment: UserDetailsComments) => comment.id !== thisComment.id)
+            rates: [
+              ...state.userDetails?.rates?.filter((thisRate: UserDetailsRates) => rate.id !== thisRate.id)
             ]
           }
         }
@@ -91,7 +95,7 @@ const Comment = ({comment, userId, movieId, fromUserProfile, isFirst}: CommentTy
     <Fragment>
 
       <li 
-        className={`comment-container comment-container-${movie?.id}`}
+        className={`rate-container rate-container-${movie?.id}`}
         movie-id={movie?.id}
         style={{
           order: movie?.id,
@@ -109,22 +113,46 @@ const Comment = ({comment, userId, movieId, fromUserProfile, isFirst}: CommentTy
           && isFirst
           && movie 
           && (
-          <img src={Loading} alt="loading" className="loading delete-comment" width={20} height={20} />
+          <img src={Loading} alt="loading" className="loading delete-rate" width={20} height={20} />
         )}
-        <div className="comment">
+        <div className="rate">
           <div className="author">
-            <img src={comment.photoURL ?? Unknown } alt="pp" className="photoURL" width={40} height={40}/>
-            <p className="comment-author">{comment.displayName ?? "Anonyme"}</p>
+            <img src={rate.photoURL ?? Unknown } alt="pp" className="photoURL" width={40} height={40}/>
+            <p className="rate-author">{rate.displayName ?? "Anonyme"}</p>
           </div>
-          <p className="comment-content">{comment.text}</p>
+          <div className="stars-container">
+              
+              {[...Array(5)].map((_, index) => {
+                const ratingValue = index + 1;
+                
+                return (
+                  <label htmlFor="rate" key={index}>
 
-          {(comment.userId === userId || state.userDetails?.admin) && !loading ? (
+                    <label 
+                      htmlFor={`rate-${ratingValue}`} 
+                      className="star-label"
+                    >
+                      <img 
+                        src={ratingValue <= rate.rate ? StartFull : StartEmpty} 
+                        alt="star" 
+                        className="star" 
+                        width={30} 
+                        height={30} 
+                      />
+                    </label>
+                    
+                  </label>
+                )
+              })}
+          </div>
+
+          {(rate.userId === userId || state.userDetails?.admin) && !loading ? (
             <button 
-              className="delete-comment"
-              onClick={removeComment}
+              className="delete-rate"
+              onClick={removeRate}
             >X</button>
-          ): (comment.userId === userId || state.userDetails?.admin) &&  (
-            <img src={Loading} alt="loading" className="loading delete-comment" width={20} height={20} />
+          ): (rate.userId === userId || state.userDetails?.admin) &&  (
+            <img src={Loading} alt="loading" className="loading delete-rate" width={20} height={20} />
           )}
         </div>
       </li>
@@ -133,4 +161,4 @@ const Comment = ({comment, userId, movieId, fromUserProfile, isFirst}: CommentTy
   );
 };
 
-export default Comment;
+export default Rate;

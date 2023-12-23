@@ -12,6 +12,7 @@ import { UPDATE_USER_INFOS } from "../../reducer/AuthReducer";
 import MovieComments from "../Comments/MovieComments";
 import CreateComment from "../Comments/CreateComment";
 import { MoviesColection } from "../../types/colections.type";
+import CreateRate from "../Rates/CreateRate";
 
 export type MovieContentPropsType = {
   id: number;
@@ -83,10 +84,18 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
     try {
       const res = await MoviesService.getMovieData(id);
 
-      if(!res) return;
-      const resDate = res.data()
+      if(!res) {
+        await MoviesService.createMovie(id);
+        const res = await MoviesService.getMovieData(id);
 
-      setMovieCollection(resDate as MoviesColection);
+        if(!res) return;
+        const resDate = res.data()
+        setMovieCollection(resDate as MoviesColection);
+      }else{
+        const resDate = res.data()
+        setMovieCollection(resDate as MoviesColection);
+      };
+
     } catch (error) {
       console.log(error);
     }
@@ -108,6 +117,16 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
       getLike();
     }
   }, [movie]);
+
+  useEffect(() => {
+    if (state.update) {
+      getMovieCollection();
+      dispatch({
+        type: "UPDATE",
+        payload: { update: false },
+      });
+    }
+  }, [state.update]);
 
   const toggleLikeMovie = async () => {
     setLoadingLike(true);
@@ -165,7 +184,7 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
                       <Fragment>
                         {!isLike ? (
                           <img
-                            src="/heart.png"
+                            src="/heart.svg"
                             className="like"
                             onClick={() => {
                               toggleLikeMovie();
@@ -173,7 +192,7 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
                           />
                         ) : (
                           <img
-                            src="/heart_fill.png"
+                            src="/heart_fill.svg"
                             className="like"
                             onClick={() => {
                               toggleLikeMovie();
@@ -278,15 +297,30 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
                     ))}
                   </p>
 
-                  <p className="vote_average">
-                    Note moyenne : {movie.vote_average}
-                  </p>
-
                   <p className="vote_count">
                     Nombre de j'aime : {movieCollection?.likes ?? "0"}
                   </p>
+
+                  <p className="rate_average">
+                    Note moyenne :{" "}
+                    {movieCollection?.rates?.length
+                      ? (
+                          movieCollection?.rates?.reduce(
+                            (acc, rate) => acc + rate.rate,
+                            0
+                          ) / movieCollection?.rates?.length
+                        ).toFixed(1)
+                      : "0"} ({movieCollection?.rates?.length ?? "0"})
+                  </p>
+
                 </div>
+
+                {state.isLogged && state.userInfos &&(
+                  <CreateRate movie={movie} userInfos={state.userInfos} />
+                )}
+
               </div>
+
             </div>
 
             <div className="cast">
