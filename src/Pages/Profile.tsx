@@ -5,6 +5,7 @@ import EditProfile from "../components/Profile/EditProfile";
 import UserComments from "../components/Profile/UserComments";
 import Admin from "../components/Profile/Admin";
 import UserDetailsService from "../services/userdetails.service";
+import UserRates from "../components/Profile/UserRates";
 
 const Profile = () => {
   const { dispatch, state } = useContext(AuthContext);
@@ -30,8 +31,8 @@ const Profile = () => {
         }
       });
 
-    } catch (error) {
-      console.log(error);
+    } catch (err) {
+      console.log(err);
     }
   }
 
@@ -64,6 +65,13 @@ const Profile = () => {
             Mes commentaires
           </button>
 
+          <button
+            className={tab === "rates" ? "active" : ""}
+            onClick={() => setTab("rates")}
+          >
+            Mes notes
+          </button>
+
           {state.userDetails?.admin && (
             <button
             className={tab === "admin" ? "active" : ""}
@@ -76,6 +84,7 @@ const Profile = () => {
         </div>
         
         {tab === "comments" && <UserComments />}
+        {tab === "rates" && <UserRates />}
         {tab === "edit" && <EditProfile />}
         {tab === "admin" && state.userDetails?.admin && <Admin />}
       </div>

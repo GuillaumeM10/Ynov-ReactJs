@@ -67,8 +67,8 @@ const CreateComment = ({movie, userInfos}:CreateCommentType) => {
       });
 
       setLoading(false);
-    } catch (error) {
-      console.log(error);
+    } catch (err) {
+      console.log(err);
       setLoading(false);
     }
   }

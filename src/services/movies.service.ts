@@ -1,4 +1,4 @@
-import { MovieComment } from "../types/colections.type";
+import { MovieComment, MovieRate } from "../types/colections.type";
 import { Credits, Movie, Movies } from "../types/movie.type";
 import api from "./api.service";
 import { db } from "./firebase.service";
@@ -36,6 +36,14 @@ export type MovieServiceType = {
   removeComment: (movieId: Movie["id"], id: string) => Promise<DocumentReference<DocumentData, DocumentData> | void>;
   
   getMoviesWithComments: () => Promise<QueryDocumentSnapshot<DocumentData, DocumentData>[]>;
+
+  addRate: (movieId: Movie["id"], userId: string, displayName: string | null, photoURL: string | null, rate: number, id: string) => Promise<DocumentReference<DocumentData, DocumentData> | void>;
+
+  removeRate: (movieId: Movie["id"], id: string) => Promise<DocumentReference<DocumentData, DocumentData> | void>;
+
+  getMoviesWithRates: () => Promise<QueryDocumentSnapshot<DocumentData, DocumentData>[]>;
+
+  createMovie: (movieId: Movie["id"]) => Promise<void>;
 
 };
 
@@ -87,6 +95,16 @@ const getMovieData = async (movieId: Movie["id"]) => {
   return querySnapshot.docs[0];
 };
 
+const createMovie = async (movieId: Movie["id"]) => {
+  try {
+    await addDoc(collection(db, "Movies"), {
+      movieId: movieId,
+    });
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 const likeMovie = async (movie: Movie) => {
   const movieExists = await getMovieData(movie.id);
 
@@ -102,15 +120,11 @@ const likeMovie = async (movie: Movie) => {
 
     } else {
 
-      const docRef = await addDoc(collection(db, "Movies"), {
-        movieId: movie.id,
-        likes: 1,
-      });
-      return docRef;
+      createMovie(movie.id);
 
     }
-  } catch (error) {
-      console.log(error);
+  } catch (err) {
+      console.log(err);
   }
 };
 
@@ -132,9 +146,9 @@ const removeLikeMovie = async (movie: Movie) => {
         });
       }
     }
-  }catch(error){
-    console.log(error);
-    throw error;
+  }catch(err){
+    console.log(err);
+    throw err;
   }
 };
 
@@ -186,8 +200,8 @@ const addComment = async (
       });
       return docRef;
     }
-  } catch (error) {
-    console.log(error);
+  } catch (err) {
+    console.log(err);
   }
 }
 
@@ -203,13 +217,111 @@ const removeComment = async (movieId: Movie["id"], id: string) => {
       });
       return movieRef;
     }
-  } catch (error) {
-    console.log(error);
+  } catch (err) {
+    console.log(err);
   }
 }
 
 const getMoviesWithComments = async () => {
   const q = query(collection(db, "Movies"), where("comments", "!=", []));
+  const querySnapshot = await getDocs(q);  
+  return querySnapshot.docs;
+}
+
+const addRate = async (
+  movieId: Movie["id"],
+  userId: string, 
+  displayName: string | null, 
+  photoURL: string | null, 
+  rate: number,
+  id: string
+) => {
+  try {
+    const movieExists = await getMovieData(movieId);
+    if (movieExists) {
+      const movieRef = doc(db, "Movies", movieExists.id);
+      
+      if(movieExists.data().rates){
+        
+        if (movieExists.data().rates.some((rate: MovieRate) => rate.userId === userId)) {
+          
+          await updateDoc(movieRef, {
+            rates: movieExists.data().rates.map((thisRate: MovieRate) => {
+              if(thisRate.userId === userId){
+                return {
+                  ...thisRate,
+                  rate: rate,
+                }
+              }
+              return thisRate;
+            }),
+          });
+
+        }else{
+          await updateDoc(movieRef, {
+            rates: [...movieExists.data().rates, { 
+              userId,
+              displayName,
+              photoURL,
+              rate, 
+              id 
+            }],
+          });
+
+        }
+        return movieRef;
+        
+      }else{
+        await updateDoc(movieRef, {
+          rates: [{ 
+            userId,
+            displayName,
+            photoURL,
+            rate, 
+            id 
+          }],
+        });
+      }
+      return movieRef;
+    }else{
+      
+      const docRef = await addDoc(collection(db, "Movies"), {
+        movieId: movieId,
+        rates: [
+          {
+            displayName,
+            photoURL,
+            rate, 
+            id 
+          }
+        ],
+      });
+      return docRef;
+    }
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+const removeRate = async (movieId: Movie["id"], id: string) => {
+  try {
+    const movieExists = await getMovieData(movieId);
+
+    if (movieExists) {
+      const movieRef = doc(db, "Movies", movieExists.id);
+      
+      await updateDoc(movieRef, {
+        rates: movieExists.data().rates.filter((rate: MovieRate) => rate.id !== id),
+      });
+      return movieRef;
+    }
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+const getMoviesWithRates = async () => {
+  const q = query(collection(db, "Movies"), where("rates", "!=", []));
   const querySnapshot = await getDocs(q);  
   return querySnapshot.docs;
 }
@@ -225,6 +337,10 @@ const MovieService: MovieServiceType = {
   addComment,
   removeComment,
   getMoviesWithComments,
+  addRate,
+  removeRate,
+  getMoviesWithRates,
+  createMovie
 };
 
 export default MovieService;

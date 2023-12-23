@@ -98,11 +98,11 @@ const EditProfile = () => {
         text: resp,
       });
       setLoading(false);
-    } catch (error) {
-      console.log(error);
+    } catch (err) {
+      console.log(err);
       setMessage({
         success: false,
-        text: error as string,
+        text: err as string,
       });
       setLoading(false);
     }
@@ -212,7 +212,7 @@ const EditProfile = () => {
 
             {message.text && (
               <p
-                className={`message ${message.success ? "success" : "error"}`}
+                className={`message ${message.success ? "success" : "err"}`}
                 style={{ color: message.success ? "green" : "red" }}
               >
                 {message.text}
