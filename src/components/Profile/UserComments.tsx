@@ -1,7 +1,7 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import Comment from "../Comments/Comment";
-import { MoviesColection, UserDetailsType } from "../../types/colections.type";
+import { MoviesColection, UserDetailsComments, UserDetailsType } from "../../types/colections.type";
 import MovieService from "../../services/movies.service";
 
 
@@ -31,8 +31,8 @@ const UserComments = ({adminPanel}: UserCommentsType) => {
 
       setMovies(movies)
       setLoading(false)
-    } catch (error) {
-      console.log(error);
+    } catch (err) {
+      console.log(err);
       setLoading(true)
     }
   }
@@ -46,13 +46,14 @@ const UserComments = ({adminPanel}: UserCommentsType) => {
       getMoviesWithComments();
       dispatch({
         type: "UPDATE",
+        payload: { update: false },
       });
     }
   }, [state.update]);
   
   useEffect(() => {
     if(!state.userDetails?.comments || adminPanel) return;
-    const sortedComments = state.userDetails?.comments?.sort((a, b) => {
+    const sortedComments = state.userDetails?.comments?.sort((a: UserDetailsComments, b: UserDetailsComments) => {
       return a.movieId - b.movieId;
     })
     setUserDetailsComments(sortedComments)

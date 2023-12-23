@@ -12,7 +12,7 @@ import {
 } from "firebase/firestore";
 import { db } from "./firebase.service";
 import { Movie } from "../types/movie.type";
-import { UserDetailsType } from "../types/colections.type";
+import { UserDetailsComments, UserDetailsRates, UserDetailsType } from "../types/colections.type";
 
 export type UserDetailsServiceType = {
 
@@ -32,6 +32,9 @@ export type UserDetailsServiceType = {
 
   removeComment: (userId: string, id: string) => Promise<DocumentData | void>;
 
+  addRate: (userId: string, movie: Movie, rate: number, id: string) => Promise<DocumentData | void>;
+
+  removeRate: (userId: string, id: string) => Promise<DocumentData | void>;
 };
 
 const createUserdetailsColection = async (userId: string) => {
@@ -43,9 +46,9 @@ const createUserdetailsColection = async (userId: string) => {
     });
 
     return resp;
-  } catch (error) {
-    console.log(error);
-    throw error;
+  } catch (err) {
+    console.log(err);
+    throw err;
   }
 };
 
@@ -58,9 +61,9 @@ const getUserDetails = async (userId: string) => {
   try {
     const querySnapshot = await getDocs(q);
     return querySnapshot.docs[0];
-  } catch (error) {
-    console.log(error);
-    throw error;
+  } catch (err) {
+    console.log(err);
+    throw err;
   }
 };
 
@@ -96,8 +99,8 @@ const toggleLikeMovie = async (userId: string, movie: Movie) => {
     }
 
     return userDetails.data() as UserDetailsType;
-  } catch (error) {
-    console.log(error);
+  } catch (err) {
+    console.log(err);
   }
 };
 
@@ -115,8 +118,8 @@ const toggleIsAdmin = async (userId: string, isAdmin: boolean) => {
     });
 
     return userDetails.data();
-  }catch (error) {
-    console.log(error);
+  }catch (err) {
+    console.log(err);
   }
 }
 
@@ -159,8 +162,8 @@ const addComment = async (
       });
     }
     return userDetails.data();
-  }catch (error) {
-    console.log(error);
+  }catch (err) {
+    console.log(err);
   }
 }
 
@@ -174,15 +177,100 @@ const removeComment = async (userId: string, id: string) => {
 
     await updateDoc(doc(db, "userDetails", userDetailsId), {
       ...userDetailsData,
-      comments: userDetailsData.comments.filter((comment: any) => comment.id !== id)
+      comments: userDetailsData.comments.filter((comment: UserDetailsComments) => comment.id !== id)
     });
 
     return userDetails.data();
-  }catch (error) {
-    console.log(error);
+  }catch (err) {
+    console.log(err);
   }
 }
 
+const addRate = async (
+  userId: string, 
+  movie: Movie, 
+  rate: number, 
+  id: string
+) => {
+
+  try{
+    const userDetails = await getUserDetails(userId);
+    if (!userDetails) return;
+
+    const userDetailsId = userDetails.id;
+    const userDetailsData = userDetails.data();
+
+    if(userDetailsData.rates){
+      if (userDetailsData.rates.find((rate: UserDetailsRates) => rate.movieId === movie.id)) {
+
+        await updateDoc(doc(db, "userDetails", userDetailsId), {
+          ...userDetailsData,
+          rates: userDetailsData.rates.map((thisRate: UserDetailsRates) => {
+            if (thisRate.movieId === movie.id) {
+              return {
+                ...thisRate,
+                rate: rate,
+              };
+            }
+            return thisRate;
+          })
+        });
+
+        return userDetails.data();
+
+      }else{
+        
+        await updateDoc(doc(db, "userDetails", userDetailsId), {
+          ...userDetailsData,
+          rates: [
+            ...userDetailsData.rates,
+            {
+              movieId: movie.id,
+              rate,
+              id
+            }
+          ]
+        });
+
+      }
+     
+    }else{
+      
+      await updateDoc(doc(db, "userDetails", userDetailsId), {
+        ...userDetailsData,
+        rates: [
+          {
+            movieId: movie.id,
+            rate,
+            id
+          }
+        ]
+      });
+    }
+    return userDetails.data();
+  }catch (err) {
+    console.log(err);
+  }
+}
+
+const removeRate = async (userId: string, id: string) => {
+  try{
+    const userDetails = await getUserDetails(userId);
+    if (!userDetails) return;
+
+    const userDetailsId = userDetails.id;
+    const userDetailsData = userDetails.data();
+
+    await updateDoc(doc(db, "userDetails", userDetailsId), {
+      ...userDetailsData,
+      rates: userDetailsData.rates.filter((rate: UserDetailsRates) => rate.id !== id)
+    });
+
+    return userDetails.data();
+  }catch (err) {
+    console.log(err);
+  }
+}
 
 const UserDetailsService: UserDetailsServiceType = {
   createUserdetailsColection,
@@ -190,7 +278,9 @@ const UserDetailsService: UserDetailsServiceType = {
   toggleLikeMovie,
   toggleIsAdmin,
   addComment,
-  removeComment
+  removeComment,
+  addRate,
+  removeRate
 };
 
 export default UserDetailsService;

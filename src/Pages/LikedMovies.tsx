@@ -30,8 +30,8 @@ const LikedMovies = () => {
         }
       });
 
-    } catch (error) {
-      console.log(error);
+    } catch (err) {
+      console.log(err);
     }
   }
   useEffect(() => {
@@ -46,8 +46,8 @@ const LikedMovies = () => {
         });
         const movieData = await Promise.all(moviePromises);
         setMovies(movieData);
-      } catch (error) {
-        console.log(error);
+      } catch (err) {
+        console.log(err);
       }
     }
   };

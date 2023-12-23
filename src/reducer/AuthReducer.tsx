@@ -15,7 +15,7 @@ export const initState = {
 export const LOGIN = "LOGIN";
 export const LOGOUT = "LOGOUT";
 export const UPDATE_USER_INFOS = "UPDATE_USER_INFOS";
-export const UPADTE = "UPDATE";
+export const UPDATE = "UPDATE";
 
 export type AuthStateType = {
   isLogged: boolean;
@@ -30,6 +30,7 @@ export type AuthActionType = {
   payload: {
     userInfos: User;
     userDetails: UserDetailsType;
+    update: boolean;
   };
 };
 
@@ -61,11 +62,12 @@ export const authReducer = (state: AuthStateType, action: AuthActionType) => {
         isLogged: false,
         userInfos: initState.userInfos,
         userDetails: initState.userDetails,
+        update: initState.update,
       };
-    case UPADTE: {
+    case UPDATE: {
       return {
         ...state,
-        update: !state.update,
+        update: action.payload.update,
       };
     }
     default:
