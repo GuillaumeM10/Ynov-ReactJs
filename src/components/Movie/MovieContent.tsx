@@ -75,7 +75,11 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
 
   const getLike = async (): Promise<void> => {
     try {
-      if(!state.userDetails?.likes) return;
+      if(!state.userDetails?.likes) {
+        setIsLike(false)
+        setLoadingLike(false)
+        return;
+      };
       setIsLike(state.userDetails?.likes?.includes(movie?.id as number))
       setLoadingLike(false)
     } catch (err: unknown) {
