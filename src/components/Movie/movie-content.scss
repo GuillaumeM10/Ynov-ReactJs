@@ -146,4 +146,8 @@
       aspect-ratio: 9/16;
     }
   }
+
+  @media screen and (max-width: 768px) {
+    margin-bottom: 7rem;
+  }
 }
