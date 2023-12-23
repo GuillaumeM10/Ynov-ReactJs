@@ -22,8 +22,8 @@ const MovieComments = ({movie}:MovieCommentsType) => {
       const resDate = res.data()
 
       setMovieCollection(resDate as MoviesColection);
-    } catch (error) {
-      console.log(error);
+    } catch (err) {
+      console.log(err);
     }
   }
 
@@ -38,6 +38,7 @@ const MovieComments = ({movie}:MovieCommentsType) => {
       getMovieCollection();
       dispatch({
         type: "UPDATE",
+        payload: { update: false },
       });
     }
   }, [state.update]);

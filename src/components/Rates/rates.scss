@@ -1,9 +1,9 @@
-.comments-list{
+.rates-list{
   display: flex;
   flex-direction: column;
   justify-content: center;
 
-  li:last-of-type .comment{
+  li:last-of-type .rate{
     border-bottom: none;
   }
 
@@ -22,7 +22,7 @@
     }
   }
 
-  .comment{
+  .rate{
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
@@ -36,13 +36,13 @@
       padding: 0 1rem;
       width: 20%;
 
-      .comment-author{
+      .rate-author{
         text-overflow: ellipsis;
         overflow: hidden;
       }
     }
 
-    .delete-comment{
+    .delete-rate{
       position: absolute;
       top: 2rem;
       right: 0;

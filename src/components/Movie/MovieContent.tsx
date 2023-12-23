@@ -1,6 +1,6 @@
 import { Fragment, useContext, useEffect, useState } from "react";
 import MoviesService from "../../services/movies.service";
-import { Cast, Credits, Crew, Movie } from "../../types/movie.type";
+import { Cast, Credits, Crew, Movie, Movies, Videos } from "../../types/movie.type";
 import "./movie-content.scss";
 import { Navigation, Pagination, Scrollbar, A11y } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -12,6 +12,9 @@ import { UPDATE_USER_INFOS } from "../../reducer/AuthReducer";
 import MovieComments from "../Comments/MovieComments";
 import CreateComment from "../Comments/CreateComment";
 import { MoviesColection } from "../../types/colections.type";
+import CreateRate from "../Rates/CreateRate";
+import MovieCard from "./MovieCard";
+import { toast } from "react-hot-toast";
 
 export type MovieContentPropsType = {
   id: number;
@@ -23,6 +26,8 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [credits, setCredits] = useState<Credits>();
+  const [videos, setVideos] = useState<Videos | null>(null);
+  const [similars, setSimilars] = useState<Movies | null>(null);
   const { state } = useContext(AuthContext);
   const { dispatch } = useContext(AuthContext);
   const [isLike, setIsLike] = useState(false);
@@ -83,12 +88,44 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
     try {
       const res = await MoviesService.getMovieData(id);
 
-      if(!res) return;
-      const resDate = res.data()
+      if(!res) {
+        await MoviesService.createMovie(id);
+        const res = await MoviesService.getMovieData(id);
 
-      setMovieCollection(resDate as MoviesColection);
+        if(!res) return;
+        const resDate = res.data()
+        setMovieCollection(resDate as MoviesColection);
+      }else{
+        const resDate = res.data()
+        setMovieCollection(resDate as MoviesColection);
+      };
+
     } catch (error) {
       console.log(error);
+    }
+  }
+
+  const getMovieVideos = async (): Promise<void> => {
+    try {
+      const res = await MoviesService.getMovieVideos(id);
+      setLoading(false);
+      setError(null);
+      setVideos(res);
+    } catch (err: unknown) {
+      setLoading(false);
+      setError(err as string);
+    }
+  }
+
+  const getMovieSimilar = async (): Promise<void> => {
+    try {
+      const res = await MoviesService.getMoviesSimilar(id);
+      setLoading(false);
+      setError(null);
+      setSimilars(res);
+    } catch (err: unknown) {
+      setLoading(false);
+      setError(err as string);
     }
   }
 
@@ -97,6 +134,8 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
     setLoading(true);
     getMovie();
     getCredit();
+    getMovieVideos();
+    getMovieSimilar();
   }, [id]);
 
   useEffect(() => {
@@ -108,6 +147,16 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
       getLike();
     }
   }, [movie]);
+
+  useEffect(() => {
+    if (state.update) {
+      getMovieCollection();
+      dispatch({
+        type: "UPDATE",
+        payload: { update: false },
+      });
+    }
+  }, [state.update]);
 
   const toggleLikeMovie = async () => {
     setLoadingLike(true);
@@ -146,6 +195,10 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
     }
   }
 
+  useEffect(() => {
+    console.log(videos);
+  }, [videos]);
+
   return (
     <Fragment>
       {loading ? (
@@ -165,7 +218,7 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
                       <Fragment>
                         {!isLike ? (
                           <img
-                            src="/heart.png"
+                            src="/heart.svg"
                             className="like"
                             onClick={() => {
                               toggleLikeMovie();
@@ -173,7 +226,7 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
                           />
                         ) : (
                           <img
-                            src="/heart_fill.png"
+                            src="/heart_fill.svg"
                             className="like"
                             onClick={() => {
                               toggleLikeMovie();
@@ -197,7 +250,18 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
               </div>
 
               <div className="movie-content__info">
-                <h2>{movie.title}</h2>
+                <div className="title-container">
+                  <h2>{movie.title}</h2>
+                  <button
+                    className="share secondary"
+                    onClick={() => {
+                      navigator.clipboard.writeText(
+                        window.location.href
+                      );
+                      toast.success("Lien copié dans le presse-papier");
+                    }}
+                  >Partager</button>
+                </div>
                 <p>{movie.overview}</p>
                 <div className="movie-content__info__details">
                   <p className="genres">
@@ -278,23 +342,68 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
                     ))}
                   </p>
 
-                  <p className="vote_average">
-                    Note moyenne : {movie.vote_average}
-                  </p>
-
                   <p className="vote_count">
                     Nombre de j'aime : {movieCollection?.likes ?? "0"}
                   </p>
+
+                  <p className="rate_average">
+                    Note moyenne :{" "}
+                    {movieCollection?.rates?.length
+                      ? (
+                          movieCollection?.rates?.reduce(
+                            (acc, rate) => acc + rate.rate,
+                            0
+                          ) / movieCollection?.rates?.length
+                        ).toFixed(1)
+                      : "0"} ({movieCollection?.rates?.length ?? "0"})
+                  </p>
+
                 </div>
+
+                {state.isLogged && state.userInfos &&(
+                  <CreateRate movie={movie} userInfos={state.userInfos} />
+                )}
+
               </div>
+
             </div>
+
+            {videos && videos.results.length > 0 && (
+              <div className="videos">
+                <h3>Vidéos</h3>
+
+                <Swiper
+                  modules={[Navigation, Pagination, Scrollbar, A11y]}
+                  spaceBetween={20}
+                  slidesPerView={"auto"}
+                  navigation
+                  pagination={{ clickable: true }}
+                  scrollbar={{ draggable: true }}
+                  className="videos"
+                >
+                  {videos &&
+                    videos?.results.map((video) => (
+                      <SwiperSlide key={video.id} style={{ width: "fit-content" }}>
+                        <iframe
+                          width="560"
+                          height="315"
+                          src={`https://www.youtube.com/embed/${video.key}`}
+                          title={video.name}
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        ></iframe>
+                      </SwiperSlide>
+                    ))}
+                </Swiper>
+              </div>
+            )}
 
             <div className="cast">
               <h3>Acteurs</h3>
 
               <Swiper
                 modules={[Navigation, Pagination, Scrollbar, A11y]}
-                spaceBetween={0}
+                spaceBetween={10}
                 slidesPerView={"auto"}
                 autoplay={{ delay: 2500, disableOnInteraction: false }}
                 navigation
@@ -328,7 +437,7 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
 
               <Swiper
                 modules={[Navigation, Pagination, Scrollbar, A11y]}
-                spaceBetween={0}
+                spaceBetween={10}
                 slidesPerView={"auto"}
                 autoplay={{ delay: 2500, disableOnInteraction: false }}
                 navigation
@@ -356,6 +465,29 @@ const MovieContent = ({ id }: MovieContentPropsType) => {
                   ))}
               </Swiper>
             </div>
+
+            {similars && similars.results.length > 0 && (
+              <div className="similars">
+                <h3>Films qui vous plairont</h3>
+
+                <Swiper
+                  modules={[Navigation, Pagination, Scrollbar, A11y]}
+                  spaceBetween={20}
+                  slidesPerView={"auto"}
+                  autoplay={{ delay: 2500 }}
+                  navigation
+                  pagination={{ clickable: true }}
+                  className="similars"
+                >
+                  {similars &&
+                    similars?.results.map((similar) => (
+                      <SwiperSlide key={similar.id}>
+                        <MovieCard movie={similar} />
+                      </SwiperSlide>
+                    ))}
+                </Swiper>
+              </div>
+            )}
 
             {state.isLogged && state.userInfos &&(
               <CreateComment movie={movie} userInfos={state.userInfos} />
